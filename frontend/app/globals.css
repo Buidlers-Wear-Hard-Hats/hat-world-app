@@ -1,6 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  .font-pixel {
+    font-family: 'Press Start 2P', cursive;
+  }
+}
 
 body {
   font-family: Arial, Helvetica, sans-serif;
@@ -14,7 +22,7 @@ body {
 
 @layer base {
   :root {
-    --background: 48 100% 83%;
+    --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;

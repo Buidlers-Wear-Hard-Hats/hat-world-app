@@ -13,138 +13,171 @@ import {
 import { Coins } from "lucide-react";
 import Countdown from "@/components/countdown";
 import { useMobile } from "@/hooks/use-mobile";
+import { motion } from "framer-motion";
 
-export default function TokenClaimPage() {
-  const [lastClaim, setLastClaim] = useState<number | null>(null);
-  const [canClaim, setCanClaim] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [claimed, setClaimed] = useState(false);
-  const isMobile = useMobile();
+interface DexScreenerData {
+  pair: {
+    priceUsd: string;
+    priceNative: string;
+    priceChange: {
+      h24: number;
+      h6: number;
+    };
+    volume: {
+      h24: number;
+      h6: number;
+    };
+  };
+}
 
-  // Comprobar si ya se ha reclamado en las últimas 24 horas
+export default function HomeHatApp() {
+  const [dexData, setDexData] = useState<DexScreenerData | null>(null);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    const storedLastClaim = localStorage.getItem("lastHatClaim");
-
-    if (storedLastClaim) {
-      const lastClaimTime = Number.parseInt(storedLastClaim);
-      setLastClaim(lastClaimTime);
-
-      const now = Date.now();
-      const timeElapsed = now - lastClaimTime;
-      const cooldownPeriod = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
-
-      if (timeElapsed < cooldownPeriod) {
-        setCanClaim(false);
+    const fetchDexData = async () => {
+      try {
+        const response = await fetch('https://api.dexscreener.com/latest/dex/pairs/worldchain/0xfe7a514022a58a8a4956d77b0aac0b7486f7ba8a');
+        const data = await response.json();
+        setDexData(data);
+      } catch (error) {
+        console.error('Error fetching DexScreener data:', error);
+      } finally {
+        setLoading(false);
       }
-    }
+    };
+
+    fetchDexData();
   }, []);
 
-  // Función para reclamar tokens
-  const claimTokens = () => {
-    setLoading(true);
-
-    // Simulación de una petición a la API
-    setTimeout(() => {
-      const now = Date.now();
-      localStorage.setItem("lastHatClaim", now.toString());
-      setLastClaim(now);
-      setCanClaim(false);
-      setClaimed(true);
-      setLoading(false);
-
-      // Resetear el mensaje de éxito después de 3 segundos
-      setTimeout(() => {
-        setClaimed(false);
-      }, 3000);
-    }, 1500);
-  };
-  // Función para actualizar el estado cuando finaliza el cooldown
-  const handleCooldownComplete = () => {
-    setCanClaim(true);
-  };
-
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-[#FEED86]">
-      {process.env.NEXT_PUBLIC_APP_STATE == "placeholder" ? (
-        
-        <Card className="w-full max-w-md bg-[#2C2C5A] text-black shadow-xl border-0">
-          <CardHeader className="text-center">
-            
-              <img
-                src="https://hat.ow.academy/assets/icon.png"
-                alt="HAT Icon"
-                className="h-64 object-contain"
-              />
-            <CardTitle className="text-4xl font-bold py-8 text-[#F5AD00] ">
-            HAT Token
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-center">
-            <p className="text-white text-4xl pb-8 italic font-bold">Coming Soon</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card className="w-full max-w-md bg-[#2C2C5A] text-black shadow-xl border-0">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-[#F9D649] border-2 border-black">
-              <img
-                src="https://hat.ow.academy/assets/icon.png"
-                alt="HAT Icon"
-                className="h-24 object-contain"
-              />
-            </div>
-            <CardTitle className="text-2xl font-bold text-[#F5AD00] ">
-              Claim HAT Tokens
-            </CardTitle>
-            <CardDescription className="text-white">
-              Claim your daily HAT tokens
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-center">
-            {!canClaim && lastClaim && (
-              <div className="mb-6">
-                <p className="mb-2 text-[#F5AD00]">Time left to claim:</p>
-                <Countdown
-                  targetDate={lastClaim + 24 * 60 * 60 * 1000}
-                  onComplete={handleCooldownComplete}
-                />
-              </div>
-            )}
+    <main className="flex min-h-screen flex-col items-center justify-center p-4" style={{ 
+      backgroundImage: 'url(/hat_background.png)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'repeat'
+    }}>
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="w-full max-w-md mt-4 mb-4 p-4 text-center text-4xl font-bold font-pixel"
+        style={{ 
+          backgroundImage: 'url(https://hat.ow.academy/8621a4b4a0bb087aad56.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          minHeight: '130px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        HAT <br/> Token
+      </motion.div>
 
-            {claimed && (
-              <div className="mb-4 rounded-md bg-[#F9D649]/30 p-3 text-[#2C2C5A] font-bold border border-[#F9D649]">
-                HAT tokens claimed successfully!
-              </div>
-            )}
+      <motion.img
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        src="https://raw.githubusercontent.com/open-web-academy/hat-landing/refs/heads/master/public/assets/logo-hat.png"
+        alt="HAT Logo"
+        className="w-48 mb-4"
+      />
 
-            <div className="mt-4 rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
-              <p className="text-lg text-black font-bold">Information:</p>
-              <p className="mt-2 text-sm text-white">
-                You can claim HAT tokens once every 24 hours. The tokens will be
-                automatically sent to your connected wallet.
-              </p>
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 1 }}
+        className="w-full max-w-md mb-4 p-4 text-center text-xs font-pixel text-white"
+        style={{ 
+          backgroundImage: 'url(https://hat.ow.academy/8621a4b4a0bb087aad56.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        {!loading && dexData && (
+          <div className="space-y-4 bg-black/30 p-4 rounded-lg">
+            <div className="space-y-2">
+              <p className="text-lg font-bold text-yellow-300">Price USD:<br/>${parseFloat(dexData.pair.priceUsd).toFixed(6)}</p>
+              <p className="text-lg font-bold text-yellow-300">Price:<br/>${parseFloat(dexData.pair.priceNative).toFixed(6)} WLD</p>
             </div>
-          </CardContent>
-          <CardFooter>
-            <Button
-              className={`w-full ${
-                canClaim
-                  ? "bg-[#F9D649] hover:bg-[#FFE066] text-black"
-                  : "bg-gray-400 cursor-not-allowed text-gray-600"
-              }`}
-              disabled={!canClaim || loading}
-              onClick={claimTokens}
-              size={isMobile ? "lg" : "default"}
-            >
-              {loading
-                ? "Claiming..."
-                : canClaim
-                ? "Claim HAT Tokens"
-                : "On Cooldown"}
-            </Button>
-          </CardFooter>
-        </Card>
-      )}
+            <div className="grid grid-cols-2 gap-6">
+              <div className="bg-black/40 p-3 rounded-lg">
+                <p className="text-sm font-bold text-yellow-300 mb-2">Last 24h</p>
+                <p className="text-sm text-white">
+                  Change: <span className={dexData.pair.priceChange.h24 > 0 ? "text-green-400" : "text-red-400"}>
+                    {dexData.pair.priceChange.h24 > 0 ? '↑' : '↓'} {Math.abs(dexData.pair.priceChange.h24).toFixed(2)}%
+                  </span>
+                </p>
+                <p className="text-sm text-white">
+                  Volume: <span className="text-yellow-300">${dexData.pair.volume.h24.toFixed(2)}</span>
+                </p>
+              </div>
+              <div className="bg-black/40 p-3 rounded-lg">
+                <p className="text-sm font-bold text-yellow-300 mb-2">Last 6h</p>
+                <p className="text-sm text-white">
+                  Change: <span className={dexData.pair.priceChange.h6 > 0 ? "text-green-400" : "text-red-400"}>
+                    {dexData.pair.priceChange.h6 > 0 ? '↑' : '↓'} {Math.abs(dexData.pair.priceChange.h6).toFixed(2)}%
+                  </span>
+                </p>
+                <p className="text-sm text-white">
+                  Volume: <span className="text-yellow-300">${dexData.pair.volume.h6.toFixed(2)}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </motion.div>
+      
+      <motion.div 
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+        className="w-full max-w-md mb-4 p-4 mt-6 text-center text-md font-pixel text-white"
+        style={{ 
+          backgroundImage: 'url(https://raw.githubusercontent.com/open-web-academy/hat-landing/refs/heads/master/public/assets/back-text.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        Every builder needs a Hard $HAT, right?
+      </motion.div>
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.6 }}
+        className="w-full max-w-md p-4 mt-4 text-center text-2xl font-pixel flex items-center justify-center gap-4"
+      >
+        <p>
+          Utility
+        </p>
+      </motion.div>
+      
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.8 }}
+        className="w-full max-w-md mb-4 p-4 text-center text-xs font-pixel text-white"
+        style={{ 
+          backgroundImage: 'url(https://hat.ow.academy/8621a4b4a0bb087aad56.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        <p>
+          None, builders are busy with their
+          own projects. Don't expect anything
+          more from it than the cutest yellow
+          hard hat token ever.
+        </p>
+      </motion.div>
+
+      
     </main>
   );
 }
