@@ -145,39 +145,7 @@ export default function HomeHatApp() {
       >
         Every builder needs a Hard $HAT, right?
       </motion.div>
-
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.6 }}
-        className="w-full max-w-md p-4 mt-4 text-center text-2xl font-pixel flex items-center justify-center gap-4"
-      >
-        <p>
-          Utility
-        </p>
-      </motion.div>
-      
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 0.8 }}
-        className="w-full max-w-md mb-4 p-4 text-center text-xs font-pixel text-white"
-        style={{ 
-          backgroundImage: 'url(https://hat.ow.academy/8621a4b4a0bb087aad56.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      >
-        <p>
-          None, builders are busy with their
-          own projects. Don't expect anything
-          more from it than the cutest yellow
-          hard hat token ever.
-        </p>
-      </motion.div>
-
-      
+            
     </main>
   );
 }
