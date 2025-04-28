@@ -14,6 +14,7 @@ import { Coins } from "lucide-react";
 import Countdown from "@/components/countdown";
 import { useMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
+import { MiniKit } from '@worldcoin/minikit-js';
 
 interface DexScreenerData {
   pair: {
@@ -29,6 +30,9 @@ interface DexScreenerData {
     };
   };
 }
+// ...
+console.log(MiniKit.isInstalled())
+
 
 export default function HomeHatApp() {
   const [dexData, setDexData] = useState<DexScreenerData | null>(null);

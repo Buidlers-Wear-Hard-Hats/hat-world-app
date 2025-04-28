@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { MiniKitProvider } from '@worldcoin/minikit-js/minikit-provider';
 import { Navbar } from '@/components/navbar'
 
 export const metadata: Metadata = {
@@ -15,12 +16,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <MiniKitProvider>
       <body>
         <main className="pb-16">
           {children}
         </main>
         <Navbar />
       </body>
+      </MiniKitProvider>
     </html>
   )
 }
