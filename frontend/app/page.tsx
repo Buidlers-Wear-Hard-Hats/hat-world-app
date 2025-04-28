@@ -149,6 +149,12 @@ export default function HomeHatApp() {
       >
         Every builder needs a Hard $HAT, right?
       </motion.div>
+
+      {MiniKit.isInstalled() && (
+        <Button>
+          Connect
+        </Button>
+      )}
             
     </main>
   );
