@@ -13,6 +13,10 @@ import {
 import { Coins } from "lucide-react";
 import Countdown from "@/components/countdown";
 import { useMobile } from "@/hooks/use-mobile";
+import { motion } from "framer-motion";
+import HatABI from '../../abi/hatAbi.json'
+import { MiniKit } from '@worldcoin/minikit-js'
+
 
 export default function TokenClaimPage() {
   const [lastClaim, setLastClaim] = useState<number | null>(null);
@@ -24,24 +28,50 @@ export default function TokenClaimPage() {
   // Comprobar si ya se ha reclamado en las últimas 24 horas
   useEffect(() => {
     const storedLastClaim = localStorage.getItem("lastHatClaim");
+    const hatBalance = getHatBalance();
+    console.log(hatBalance);
 
     if (storedLastClaim) {
-      const lastClaimTime = Number.parseInt(storedLastClaim);
-      setLastClaim(lastClaimTime);
+      //const lastClaimTime = Number.parseInt(storedLastClaim);
+      //setLastClaim(lastClaimTime);
 
-      const now = Date.now();
-      const timeElapsed = now - lastClaimTime;
-      const cooldownPeriod = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
+      //const now = Date.now();
+      //const timeElapsed = now - lastClaimTime;
+      //const cooldownPeriod = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
 
-      if (timeElapsed < cooldownPeriod) {
-        setCanClaim(false);
-      }
+      //if (timeElapsed < cooldownPeriod) {
+        //setCanClaim(false);
+      //}
     }
   }, []);
 
+  const getHatBalance = async () => {
+    const {commandPayload, finalPayload} = await MiniKit.commandsAsync.sendTransaction({
+      transaction: [
+        {
+          address: '0xbA494aEa8295B5640Efb4FF9252df8D388e655dc',
+          abi: HatABI,
+          functionName: 'getHatBalance',
+          args: [],
+        },
+      ],
+    })
+  }
+
   // Función para reclamar tokens
-  const claimTokens = () => {
+  const claimTokens = async () => {
     setLoading(true);
+
+    const {commandPayload, finalPayload} = await MiniKit.commandsAsync.sendTransaction({
+      transaction: [
+        {
+          address: '0x9Cf4F011F55Add3ECC1B1B497A3e9bd32183D6e8',
+          abi: HatABI,
+          functionName: 'mintToken',
+          args: ['0x126f7998Eb44Dd2d097A8AB2eBcb28dEA1646AC8'],
+        },
+      ],
+    })
 
     // Simulación de una petición a la API
     setTimeout(() => {
@@ -64,7 +94,12 @@ export default function TokenClaimPage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-[#FEED86]">
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-[#FEED86]" style={{
+      backgroundImage: 'url(/hat_background.png)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'repeat'
+    }}>
       {process.env.NEXT_PUBLIC_APP_STATE == "placeholder" ? (
         
         <Card className="w-full max-w-md bg-[#2C2C5A] text-black shadow-xl border-0">
@@ -84,7 +119,13 @@ export default function TokenClaimPage() {
           </CardContent>
         </Card>
       ) : (
-        <Card className="w-full max-w-md bg-[#2C2C5A] text-black shadow-xl border-0">
+
+        <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }} 
+        className="w-full max-w-md bg-[#2C2C5A] text-black shadow-xl border-0"
+        style={{borderRadius:"10px"}}>
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-[#F9D649] border-2 border-black">
               <img
@@ -143,7 +184,7 @@ export default function TokenClaimPage() {
                 : "On Cooldown"}
             </Button>
           </CardFooter>
-        </Card>
+        </motion.div>
       )}
     </main>
   );

@@ -104,30 +104,30 @@ export default function HomeHatApp() {
         {!loading && dexData && (
           <div className="space-y-4 bg-black/30 p-4 rounded-lg">
             <div className="space-y-2">
-              <p className="text-lg font-bold text-yellow-300">Price USD:<br/>${parseFloat(dexData.pair.priceUsd).toFixed(6)}</p>
-              <p className="text-lg font-bold text-yellow-300">Price:<br/>${parseFloat(dexData.pair.priceNative).toFixed(6)} WLD</p>
+              <p className="text-lg font-bold text-yellow-300">Price USD:<br/>${dexData.pair && parseFloat(dexData.pair.priceUsd).toFixed(6)}</p>
+              <p className="text-lg font-bold text-yellow-300">Price:<br/>${dexData.pair && parseFloat(dexData.pair.priceNative).toFixed(6)} WLD</p>
             </div>
             <div className="grid grid-cols-2 gap-6">
               <div className="bg-black/40 p-3 rounded-lg">
                 <p className="text-sm font-bold text-yellow-300 mb-2">Last 24h</p>
                 <p className="text-sm text-white">
-                  Change: <span className={dexData.pair.priceChange.h24 > 0 ? "text-green-400" : "text-red-400"}>
-                    {dexData.pair.priceChange.h24 > 0 ? '↑' : '↓'} {Math.abs(dexData.pair.priceChange.h24).toFixed(2)}%
+                  Change: <span className={dexData.pair && dexData.pair.priceChange.h24 > 0 ? "text-green-400" : "text-red-400"}>
+                    {dexData.pair && dexData.pair.priceChange.h24 > 0 ? '↑' : '↓'} {dexData.pair && Math.abs(dexData.pair.priceChange.h24).toFixed(2)}%
                   </span>
                 </p>
                 <p className="text-sm text-white">
-                  Volume: <span className="text-yellow-300">${dexData.pair.volume.h24.toFixed(2)}</span>
+                  Volume: <span className="text-yellow-300">${dexData.pair && dexData.pair.volume.h24.toFixed(2)}</span>
                 </p>
               </div>
               <div className="bg-black/40 p-3 rounded-lg">
                 <p className="text-sm font-bold text-yellow-300 mb-2">Last 6h</p>
                 <p className="text-sm text-white">
-                  Change: <span className={dexData.pair.priceChange.h6 > 0 ? "text-green-400" : "text-red-400"}>
-                    {dexData.pair.priceChange.h6 > 0 ? '↑' : '↓'} {Math.abs(dexData.pair.priceChange.h6).toFixed(2)}%
+                  Change: <span className={dexData.pair && dexData.pair.priceChange.h6 > 0 ? "text-green-400" : "text-red-400"}>
+                    {dexData.pair && dexData.pair.priceChange.h6 > 0 ? '↑' : '↓'} {dexData.pair && Math.abs(dexData.pair.priceChange.h6).toFixed(2)}%
                   </span>
                 </p>
                 <p className="text-sm text-white">
-                  Volume: <span className="text-yellow-300">${dexData.pair.volume.h6.toFixed(2)}</span>
+                  Volume: <span className="text-yellow-300">${dexData.pair && dexData.pair.volume.h6.toFixed(2)}</span>
                 </p>
               </div>
             </div>
