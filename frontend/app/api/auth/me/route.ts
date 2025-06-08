@@ -8,9 +8,9 @@ async function getUserById(userId: string) {
 
     return {
         id: userId,
-        walletAddress: "0x0eb431cd91e7abbd29a204b2edf33636ad45ed08",
-        username: "lemike.1234",
-        profilePictureUrl: "https://i.pravatar.cc/150?img=1",
+        walletAddress: "",
+        username: "",
+        profilePictureUrl: "",
         isNewUser: false
     };
 }
