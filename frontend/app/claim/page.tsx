@@ -36,6 +36,7 @@ type User = {
 
 export default function TokenClaimPage() {
   const [user, setUser] = useState<User | null>(null);
+  const [userBalance, setUserBalance] = useState<any | null>(null);
 
   const [lastClaim, setLastClaim] = useState<number | null>(null);
   const [canClaim, setCanClaim] = useState(true);
@@ -117,7 +118,13 @@ export default function TokenClaimPage() {
           args: [],
         },
       ],
-    })
+    });
+
+    if (finalPayload.status === 'error') {
+      console.error('Error sending transaction', finalPayload)
+    } else {
+      setUserBalance(finalPayload)
+    }
   }
 
   // Función para reclamar tokens
@@ -172,6 +179,7 @@ export default function TokenClaimPage() {
                     <div className="rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
                       <div className="text-white font-medium pb-4">Username <br /> {user?.username ? user.username : 'Unknown'}</div>
                       <div className="text-white font-medium pb-4">Address <br /> {user?.walletAddress ? `${user.walletAddress.slice(0, 6)}...${user.walletAddress.slice(-4)}` : 'Unknown'}</div>
+                      <div className="text-white font-medium pb-4">Balance <br /> {userBalance}</div>
                       <div className="flex flex-col items-center space-y-2">
                         <Button
                           onClick={handleLogout}
@@ -277,7 +285,7 @@ export default function TokenClaimPage() {
                       : "bg-gray-400 cursor-not-allowed text-gray-600"
                       }`}
                     disabled={!canClaim || loading}
-                    onClick={claimTokens}
+                    onClick={getHatBalance}
                     size={isMobile ? "lg" : "default"}
                   >
                     {loading
