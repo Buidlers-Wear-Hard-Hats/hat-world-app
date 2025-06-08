@@ -14,8 +14,10 @@ import { Coins } from "lucide-react";
 import Countdown from "@/components/countdown";
 import { useMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
-import HatABI from '../../abi/hatAbi.json'
+import { HAT_ABI } from "@/abi/hatAbi";
+
 import { MiniKit, WalletAuthInput } from "@worldcoin/minikit-js";
+import { WalletAuthButton } from "@/components/wallet-auth-button";
 
 
 const walletAuthInput = (nonce: string): WalletAuthInput => {
@@ -37,6 +39,7 @@ type User = {
 export default function TokenClaimPage() {
   const [user, setUser] = useState<User | null>(null);
   const [userBalance, setUserBalance] = useState<any | null>(null);
+  const [walletConnected, setWalletConnected] = useState(false);
 
   const [lastClaim, setLastClaim] = useState<number | null>(null);
   const [canClaim, setCanClaim] = useState(true);
@@ -108,12 +111,18 @@ export default function TokenClaimPage() {
     }
   };
 
+  const handleWalletConnected = () => {
+    setWalletConnected(true);
+    console.log("Wallet connected");
+  };
+  
   const getHatBalance = async () => {
-    const { commandPayload, finalPayload } = await MiniKit.commandsAsync.sendTransaction({
+
+    const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
       transaction: [
         {
           address: '0xbA494aEa8295B5640Efb4FF9252df8D388e655dc',
-          abi: HatABI,
+          abi: HAT_ABI,
           functionName: 'getHatBalance',
           args: [],
         },
@@ -121,7 +130,8 @@ export default function TokenClaimPage() {
     });
 
     if (finalPayload.status === 'error') {
-      console.error('Error sending transaction', finalPayload)
+      console.error('Error sending transaction', finalPayload);
+      return;
     } else {
       setUserBalance(finalPayload)
     }
@@ -135,7 +145,7 @@ export default function TokenClaimPage() {
       transaction: [
         {
           address: '0x9Cf4F011F55Add3ECC1B1B497A3e9bd32183D6e8',
-          abi: HatABI,
+          abi: HAT_ABI,
           functionName: 'mintToken',
           args: ['0x126f7998Eb44Dd2d097A8AB2eBcb28dEA1646AC8'],
         },
@@ -199,12 +209,7 @@ export default function TokenClaimPage() {
                         Please login to request HAT tokens.
                       </p>
                       <div className="flex flex-col items-center space-y-2 w-full mt-2">
-                        <Button
-                          onClick={handleLogin}
-                          disabled={loading}
-                        >
-                          {loading ? "Connecting..." : "Login"}
-                        </Button>
+                        {!walletConnected && <WalletAuthButton onSuccess={handleWalletConnected} />}
                       </div>
                     </div>
                   </>
