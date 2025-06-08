@@ -17,43 +17,6 @@ import { motion } from "framer-motion";
 import { MiniKit, WalletAuthInput } from '@worldcoin/minikit-js'
 
 
-const signInWithWallet = async () => {
-	if (!MiniKit.isInstalled()) {
-		return
-	}
-
-	const res = await fetch(`/api/nonce`)
-	const { nonce } = await res.json()
-
-	console.log(nonce);
-
-	const { commandPayload: generateMessageResult, finalPayload } = await MiniKit.commandsAsync.walletAuth({
-		nonce: nonce,
-		requestId: '0', // Optional
-		expirationTime: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-		notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
-		statement: 'This is my statement and here is a link https://worldcoin.com/apps',
-	})
-
-	console.log(generateMessageResult);
-
-	if (finalPayload.status === 'error') {
-		return
-	} else {
-		const response = await fetch('/api/complete-siwe', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				payload: finalPayload,
-				nonce,
-			}),
-		})
-		console.log(response);
-	}
-}
-
 interface DexScreenerData {
   pair: {
     priceUsd: string;
@@ -187,13 +150,6 @@ export default function HomeHatApp() {
       >
         Every builder needs a Hard $HAT, right?
       </motion.div>
-
-      {MiniKit.isInstalled() && (
-        <Button onClick={signInWithWallet}>
-          Connect
-        </Button>
-      )}
-            
     </main>
   );
 }

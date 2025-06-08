@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,38 +15,100 @@ import Countdown from "@/components/countdown";
 import { useMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
 import HatABI from '../../abi/hatAbi.json'
-import { MiniKit } from '@worldcoin/minikit-js'
+import { MiniKit, WalletAuthInput } from "@worldcoin/minikit-js";
 
+
+const walletAuthInput = (nonce: string): WalletAuthInput => {
+  return {
+    nonce,
+    requestId: "0",
+    expirationTime: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+    notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
+    statement: "This is my statement and here is a link https://worldcoin.com/apps",
+  };
+};
+
+type User = {
+  walletAddress?: string;
+  username?: string;
+  profilePictureUrl?: string;
+};
 
 export default function TokenClaimPage() {
+  const [user, setUser] = useState<User | null>(null);
+
   const [lastClaim, setLastClaim] = useState<number | null>(null);
   const [canClaim, setCanClaim] = useState(true);
   const [loading, setLoading] = useState(false);
   const [claimed, setClaimed] = useState(false);
   const isMobile = useMobile();
 
-  // Comprobar si ya se ha reclamado en las últimas 24 horas
-  useEffect(() => {
-    const storedLastClaim = localStorage.getItem("lastHatClaim");
-    const hatBalance = getHatBalance();
-    console.log(hatBalance);
-
-    if (storedLastClaim) {
-      //const lastClaimTime = Number.parseInt(storedLastClaim);
-      //setLastClaim(lastClaimTime);
-
-      //const now = Date.now();
-      //const timeElapsed = now - lastClaimTime;
-      //const cooldownPeriod = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
-
-      //if (timeElapsed < cooldownPeriod) {
-        //setCanClaim(false);
-      //}
+  const refreshUserData = useCallback(async () => {
+    try {
+      const response = await fetch('/api/auth/me');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.user) {
+          setUser(data.user);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
     }
   }, []);
 
+  useEffect(() => {
+    refreshUserData();
+  }, [refreshUserData]);
+
+  const handleLogin = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/nonce`);
+      const { nonce } = await res.json();
+
+      const { finalPayload } = await MiniKit.commandsAsync.walletAuth(walletAuthInput(nonce));
+
+      if (finalPayload.status === 'error') {
+        setLoading(false);
+        return;
+      } else {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            payload: finalPayload,
+            nonce,
+          }),
+        });
+
+        if (response.status === 200) {
+          setUser(MiniKit.user)
+        }
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+
+      setUser(null);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
   const getHatBalance = async () => {
-    const {commandPayload, finalPayload} = await MiniKit.commandsAsync.sendTransaction({
+    const { commandPayload, finalPayload } = await MiniKit.commandsAsync.sendTransaction({
       transaction: [
         {
           address: '0xbA494aEa8295B5640Efb4FF9252df8D388e655dc',
@@ -62,7 +124,7 @@ export default function TokenClaimPage() {
   const claimTokens = async () => {
     setLoading(true);
 
-    const {commandPayload, finalPayload} = await MiniKit.commandsAsync.sendTransaction({
+    const { commandPayload, finalPayload } = await MiniKit.commandsAsync.sendTransaction({
       transaction: [
         {
           address: '0x9Cf4F011F55Add3ECC1B1B497A3e9bd32183D6e8',
@@ -101,17 +163,17 @@ export default function TokenClaimPage() {
       backgroundRepeat: 'repeat'
     }}>
       {process.env.NEXT_PUBLIC_APP_STATE == "placeholder" ? (
-        
+
         <Card className="w-full max-w-md bg-[#2C2C5A] text-black shadow-xl border-0">
           <CardHeader className="text-center">
-            
-              <img
-                src="https://hat.ow.academy/assets/icon.png"
-                alt="HAT Icon"
-                className="h-64 object-contain"
-              />
+
+            <img
+              src="https://hat.ow.academy/assets/icon.png"
+              alt="HAT Icon"
+              className="h-64 object-contain"
+            />
             <CardTitle className="text-4xl font-bold py-8 text-[#F5AD00] ">
-            HAT Token
+              HAT Token
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center">
@@ -119,13 +181,12 @@ export default function TokenClaimPage() {
           </CardContent>
         </Card>
       ) : (
-
         <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }} 
-        className="w-full max-w-md bg-[#2C2C5A] text-black shadow-xl border-0"
-        style={{borderRadius:"10px"}}>
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="w-full max-w-md bg-[#2C2C5A] text-black shadow-xl border-0"
+          style={{ borderRadius: "10px" }}>
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-[#F9D649] border-2 border-black">
               <img
@@ -167,25 +228,106 @@ export default function TokenClaimPage() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button
-              className={`w-full ${
-                canClaim
-                  ? "bg-[#F9D649] hover:bg-[#FFE066] text-black"
-                  : "bg-gray-400 cursor-not-allowed text-gray-600"
-              }`}
-              disabled={!canClaim || loading}
-              onClick={claimTokens}
-              size={isMobile ? "lg" : "default"}
-            >
-              {loading
-                ? "Claiming..."
-                : canClaim
-                ? "Claim HAT Tokens"
-                : "On Cooldown"}
-            </Button>
+            {user ? (
+              <>
+                <div className="flex flex-col items-center space-y-2">
+                  <div className="text-green-600 font-medium">✓ Connected</div>
+                  <div className="flex items-center space-x-2">
+                    {user?.profilePictureUrl && (
+                      <img
+                        src={user.profilePictureUrl}
+                        alt="Profile"
+                        className="w-8 h-8 rounded-full"
+                      />
+                    )}
+                    <span className="font-medium">
+                      {user?.username || (user?.walletAddress ? `${user.walletAddress.slice(0, 6)}...${user.walletAddress.slice(-4)}` : 'Unknown')}
+                    </span>
+                  </div>
+                  <Button
+                    onClick={handleLogout}
+                    variant="secondary"
+                    size="default"
+                    disabled={loading}
+                  >
+                    {loading ? "Signing Out..." : "Sign Out"}
+                  </Button>
+                </div>
+                <Button
+                  className={`w-full ${canClaim
+                    ? "bg-[#F9D649] hover:bg-[#FFE066] text-black"
+                    : "bg-gray-400 cursor-not-allowed text-gray-600"
+                    }`}
+                  disabled={!canClaim || loading}
+                  onClick={claimTokens}
+                  size={isMobile ? "lg" : "default"}
+                >
+                  {loading
+                    ? "Claiming..."
+                    : canClaim
+                      ? "Claim HAT Tokens"
+                      : "On Cooldown"}
+                </Button>
+              </>) : (
+              <div className="flex flex-col items-center space-y-2 w-full">
+                <Button
+                  onClick={handleLogin}
+                  disabled={loading}
+                >
+                  {loading ? "Connecting..." : "Login"}
+                </Button>
+              </div>
+            )}
           </CardFooter>
         </motion.div>
       )}
     </main>
   );
+}
+
+
+
+
+
+
+
+
+
+{
+  MiniKit.isInstalled() && (
+    <div className="flex flex-col items-center">
+      {!user ? (
+        <Button
+          onClick={handleLogin}
+          disabled={loading}
+        >
+          {loading ? "Connecting..." : "Login"}
+        </Button>
+      ) : (
+        <div className="flex flex-col items-center space-y-2">
+          <div className="text-green-600 font-medium">✓ Connected</div>
+          <div className="flex items-center space-x-2">
+            {user?.profilePictureUrl && (
+              <img
+                src={user.profilePictureUrl}
+                alt="Profile"
+                className="w-8 h-8 rounded-full"
+              />
+            )}
+            <span className="font-medium">
+              {user?.username || (user?.walletAddress ? `${user.walletAddress.slice(0, 6)}...${user.walletAddress.slice(-4)}` : 'Unknown')}
+            </span>
+          </div>
+          <Button
+            onClick={handleLogout}
+            variant="secondary"
+            size="default"
+            disabled={loading}
+          >
+            {loading ? "Signing Out..." : "Sign Out"}
+          </Button>
+        </div>
+      )}
+    </div>
+  )
 }
