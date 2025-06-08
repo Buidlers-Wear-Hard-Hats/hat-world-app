@@ -5,9 +5,10 @@ import { MiniKit } from "@worldcoin/minikit-js";
 
 interface WalletAuthButtonProps {
   onSuccess?: () => void;
+  onAuthSuccess?: (finalPayload: any) => void;
 }
 
-export function WalletAuthButton({ onSuccess }: WalletAuthButtonProps) {
+export function WalletAuthButton({ onSuccess, onAuthSuccess }: WalletAuthButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleWalletAuth = async () => {
@@ -54,6 +55,7 @@ export function WalletAuthButton({ onSuccess }: WalletAuthButtonProps) {
         // });
 
         // Call onSuccess if provided
+        if (onAuthSuccess) onAuthSuccess(finalPayload);
         if (onSuccess) onSuccess();
       }
     } catch (error) {

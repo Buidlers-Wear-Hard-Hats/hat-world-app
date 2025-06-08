@@ -16,19 +16,8 @@ import { useMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
 import { HAT_ABI } from "@/abi/hatAbi";
 
-import { MiniKit, WalletAuthInput } from "@worldcoin/minikit-js";
+import { MiniKit } from "@worldcoin/minikit-js";
 import { WalletAuthButton } from "@/components/wallet-auth-button";
-
-
-const walletAuthInput = (nonce: string): WalletAuthInput => {
-  return {
-    nonce,
-    requestId: "0",
-    expirationTime: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-    notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
-    statement: "This is my statement and here is a link https://worldcoin.com/apps",
-  };
-};
 
 type User = {
   walletAddress?: string;
@@ -70,7 +59,23 @@ export default function TokenClaimPage() {
     setWalletConnected(true);
     console.log("Wallet connected");
   };
-  
+
+  const handleWalletAuthSuccess = (finalPayload: any) => {
+    setUser(finalPayload);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+
+      setUser(null);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
   const getHatBalance = async () => {
 
     const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
@@ -146,7 +151,7 @@ export default function TokenClaimPage() {
                       <div className="text-white font-medium pb-4">Address <br /> {user?.walletAddress ? `${user.walletAddress.slice(0, 6)}...${user.walletAddress.slice(-4)}` : 'Unknown'}</div>
                       <div className="text-white font-medium pb-4">Balance <br /> {userBalance}</div>
                       <div className="flex flex-col items-center space-y-2">
-                       
+
                       </div>
                     </div>
                   </>
@@ -157,7 +162,17 @@ export default function TokenClaimPage() {
                         Please login to request HAT tokens.
                       </p>
                       <div className="flex flex-col items-center space-y-2 w-full mt-2">
-                        {!walletConnected && <WalletAuthButton onSuccess={handleWalletConnected} />}
+                        {!walletConnected ?
+                          <WalletAuthButton onSuccess={handleWalletConnected} onAuthSuccess={handleWalletAuthSuccess} />
+                          :
+                          <Button
+                            onClick={handleLogout}
+                            variant="secondary"
+                            size="default"
+                            disabled={loading}
+                          >
+                            {loading ? "Signing Out..." : "Sign Out"}
+                          </Button>}
                       </div>
                     </div>
                   </>
