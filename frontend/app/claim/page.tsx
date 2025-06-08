@@ -156,131 +156,142 @@ export default function TokenClaimPage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-[#FEED86]" style={{
-      backgroundImage: 'url(/hat_background.png)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'repeat'
-    }}>
-      {process.env.NEXT_PUBLIC_APP_STATE == "placeholder" ? (
+    <>
+      <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-[#FEED86]" style={{
+        backgroundImage: 'url(/hat_background.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'repeat'
+      }}>
+        <>
+          <Card className="w-full max-w-md bg-[#2C2C5A] text-black shadow-xl border-0 mb-1">
+            <CardHeader className="text-center">
+              <CardTitle className="text-sm font-bold text-[#F5AD00] ">
+                {user ? (
+                  <>
+                    <div className="rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
+                      <div className="text-white font-medium pb-4">Username <br /> {user?.username ? user.username : 'Unknown'}</div>
+                      <div className="text-white font-medium pb-4">Address <br /> {user?.walletAddress ? user.walletAddress : 'Unknown'}</div>
+                      <div className="flex flex-col items-center space-y-2">
+                        <Button
+                          onClick={handleLogout}
+                          variant="secondary"
+                          size="default"
+                          disabled={loading}
+                        >
+                          {loading ? "Signing Out..." : "Sign Out"}
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
+                      <p className="mt-2 text-sm text-white">
+                        Please login to request HAT tokens.
+                      </p>
+                      <div className="flex flex-col items-center space-y-2 w-full mt-2">
+                        <Button
+                          onClick={handleLogin}
+                          disabled={loading}
+                        >
+                          {loading ? "Connecting..." : "Login"}
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </CardTitle>
+            </CardHeader>
+          </Card>
+          {process.env.NEXT_PUBLIC_APP_STATE == "placeholder" ? (
 
-        <Card className="w-full max-w-md bg-[#2C2C5A] text-black shadow-xl border-0">
-          <CardHeader className="text-center">
+            <Card className="w-full max-w-md bg-[#2C2C5A] text-black shadow-xl border-0">
+              <CardHeader className="text-center">
 
-            <img
-              src="https://hat.ow.academy/assets/icon.png"
-              alt="HAT Icon"
-              className="h-64 object-contain"
-            />
-            <CardTitle className="text-4xl font-bold py-8 text-[#F5AD00] ">
-              HAT Token
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-center">
-            <p className="text-white text-4xl pb-8 italic font-bold">Coming Soon</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="w-full max-w-md bg-[#2C2C5A] text-black shadow-xl border-0"
-          style={{ borderRadius: "10px" }}>
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-[#F9D649] border-2 border-black">
-              <img
-                src="https://hat.ow.academy/assets/icon.png"
-                alt="HAT Icon"
-                className="h-24 object-contain"
-              />
-            </div>
-            <CardTitle className="text-2xl font-bold text-[#F5AD00] ">
-              Claim HAT Tokens
-            </CardTitle>
-            <CardDescription className="text-white">
-              Claim your daily HAT tokens
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-center">
-            {!canClaim && lastClaim && (
-              <div className="mb-6">
-                <p className="mb-2 text-[#F5AD00]">Time left to claim:</p>
-                <Countdown
-                  targetDate={lastClaim + 24 * 60 * 60 * 1000}
-                  onComplete={handleCooldownComplete}
+                <img
+                  src="https://hat.ow.academy/assets/icon.png"
+                  alt="HAT Icon"
+                  className="h-64 object-contain"
                 />
-              </div>
-            )}
-
-            {claimed && (
-              <div className="mb-4 rounded-md bg-[#F9D649]/30 p-3 text-[#2C2C5A] font-bold border border-[#F9D649]">
-                HAT tokens claimed successfully!
-              </div>
-            )}
-
-            <div className="mt-4 rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
-              <p className="text-lg text-black font-bold">Information:</p>
-              <p className="mt-2 text-sm text-white">
-                You can claim HAT tokens once every 24 hours. The tokens will be
-                automatically sent to your connected wallet.
-              </p>
-            </div>
-          </CardContent>
-          <CardFooter>
-            {user ? (
-              <>
-                <div className="flex flex-col items-center space-y-2">
-                  <div className="text-green-600 font-medium">✓ Connected</div>
-                  <div className="flex items-center space-x-2">
-                    {user?.profilePictureUrl && (
-                      <img
-                        src={user.profilePictureUrl}
-                        alt="Profile"
-                        className="w-8 h-8 rounded-full"
-                      />
-                    )}
-                    <span className="font-medium">
-                      {user?.username || (user?.walletAddress ? `${user.walletAddress.slice(0, 6)}...${user.walletAddress.slice(-4)}` : 'Unknown')}
-                    </span>
-                  </div>
-                  <Button
-                    onClick={handleLogout}
-                    variant="secondary"
-                    size="default"
-                    disabled={loading}
-                  >
-                    {loading ? "Signing Out..." : "Sign Out"}
-                  </Button>
+                <CardTitle className="text-4xl font-bold py-8 text-[#F5AD00] ">
+                  HAT Token
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-white text-4xl pb-8 italic font-bold">Coming Soon</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="w-full max-w-md bg-[#2C2C5A] text-black shadow-xl border-0"
+              style={{ borderRadius: "10px" }}>
+              <CardHeader className="text-center">
+                <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-[#F9D649] border-2 border-black">
+                  <img
+                    src="https://hat.ow.academy/assets/icon.png"
+                    alt="HAT Icon"
+                    className="h-24 object-contain"
+                  />
                 </div>
-                <Button
-                  className={`w-full ${canClaim
-                    ? "bg-[#F9D649] hover:bg-[#FFE066] text-black"
-                    : "bg-gray-400 cursor-not-allowed text-gray-600"
-                    }`}
-                  disabled={!canClaim || loading}
-                  onClick={claimTokens}
-                  size={isMobile ? "lg" : "default"}
-                >
-                  {loading
-                    ? "Claiming..."
-                    : canClaim
-                      ? "Claim HAT Tokens"
-                      : "On Cooldown"}
-                </Button>
-              </>) : (
-              <div className="flex flex-col items-center space-y-2 w-full">
-                <Button
-                  onClick={handleLogin}
-                  disabled={loading}
-                >
-                  {loading ? "Connecting..." : "Login"}
-                </Button>
-              </div>
-            )}
-          </CardFooter>
-        </motion.div>
-      )}
-    </main>
+                <CardTitle className="text-2xl font-bold text-[#F5AD00] ">
+                  Claim HAT Tokens
+                </CardTitle>
+                <CardDescription className="text-white">
+                  Claim your daily HAT tokens
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-center">
+                {!canClaim && lastClaim && (
+                  <div className="mb-6">
+                    <p className="mb-2 text-[#F5AD00]">Time left to claim:</p>
+                    <Countdown
+                      targetDate={lastClaim + 24 * 60 * 60 * 1000}
+                      onComplete={handleCooldownComplete}
+                    />
+                  </div>
+                )}
+
+                {claimed && (
+                  <div className="mb-4 rounded-md bg-[#F9D649]/30 p-3 text-[#2C2C5A] font-bold border border-[#F9D649]">
+                    HAT tokens claimed successfully!
+                  </div>
+                )}
+
+                <div className="mt-4 rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
+                  <p className="text-lg text-black font-bold">Information:</p>
+                  <p className="mt-2 text-sm text-white">
+                    You can claim HAT tokens once every 24 hours. The tokens will be
+                    automatically sent to your connected wallet.
+                  </p>
+                </div>
+              </CardContent>
+              <CardFooter>
+                {user && (
+                  <Button
+                    className={`w-full ${canClaim
+                      ? "bg-[#F9D649] hover:bg-[#FFE066] text-black"
+                      : "bg-gray-400 cursor-not-allowed text-gray-600"
+                      }`}
+                    disabled={!canClaim || loading}
+                    onClick={claimTokens}
+                    size={isMobile ? "lg" : "default"}
+                  >
+                    {loading
+                      ? "Claiming..."
+                      : canClaim
+                        ? "Claim HAT Tokens"
+                        : "On Cooldown"}
+                  </Button>
+                )}
+              </CardFooter>
+            </motion.div>
+          )}
+        </>
+      </main>
+    </>
   );
 }
