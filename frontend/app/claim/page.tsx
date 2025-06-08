@@ -65,51 +65,6 @@ export default function TokenClaimPage() {
     refreshUserData();
   }, [refreshUserData]);
 
-  const handleLogin = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(`/api/nonce`);
-      const { nonce } = await res.json();
-
-      const { finalPayload } = await MiniKit.commandsAsync.walletAuth(walletAuthInput(nonce));
-
-      if (finalPayload.status === 'error') {
-        setLoading(false);
-        return;
-      } else {
-        const response = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            payload: finalPayload,
-            nonce,
-          }),
-        });
-
-        if (response.status === 200) {
-          setUser(MiniKit.user)
-        }
-        setLoading(false);
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      setLoading(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-      });
-
-      setUser(null);
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
-  };
 
   const handleWalletConnected = () => {
     setWalletConnected(true);
@@ -191,14 +146,7 @@ export default function TokenClaimPage() {
                       <div className="text-white font-medium pb-4">Address <br /> {user?.walletAddress ? `${user.walletAddress.slice(0, 6)}...${user.walletAddress.slice(-4)}` : 'Unknown'}</div>
                       <div className="text-white font-medium pb-4">Balance <br /> {userBalance}</div>
                       <div className="flex flex-col items-center space-y-2">
-                        <Button
-                          onClick={handleLogout}
-                          variant="secondary"
-                          size="default"
-                          disabled={loading}
-                        >
-                          {loading ? "Signing Out..." : "Sign Out"}
-                        </Button>
+                       
                       </div>
                     </div>
                   </>

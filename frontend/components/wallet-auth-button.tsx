@@ -44,14 +44,14 @@ export function WalletAuthButton({ onSuccess }: WalletAuthButtonProps) {
       const verification = await verifyRes.json();
       console.log("verification", verification);
 
-      if (verification.isValid) {
-        await signIn("worldcoin-wallet", {
-          message: finalPayload.message,
-          signature: finalPayload.signature,
-          address: finalPayload.address,
-          nonce,
-          redirect: false,
-        });
+      // if (verification.isValid) {
+      //   await signIn("worldcoin-wallet", {
+      //     message: finalPayload.message,
+      //     signature: finalPayload.signature,
+      //     address: finalPayload.address,
+      //     nonce,
+      //     redirect: false,
+      //   });
 
         // Call onSuccess if provided
         if (onSuccess) onSuccess();
@@ -76,7 +76,6 @@ export function WalletAuthButton({ onSuccess }: WalletAuthButtonProps) {
         </div>
       ) : (
         <div className="flex items-center">
-          <span className="mr-2">🎰</span>
           <span className="font-serif">Connect Wallet</span>
         </div>
       )}
