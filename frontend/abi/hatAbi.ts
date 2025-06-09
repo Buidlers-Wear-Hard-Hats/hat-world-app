@@ -176,7 +176,13 @@ export const HAT_ABI = [
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      }
+    ],
     "name": "getAddressVerification",
     "outputs": [
       {
@@ -189,7 +195,13 @@ export const HAT_ABI = [
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      }
+    ],
     "name": "getHatBalance",
     "outputs": [
       {

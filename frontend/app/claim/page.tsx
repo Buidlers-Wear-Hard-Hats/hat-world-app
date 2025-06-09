@@ -17,6 +17,7 @@ import { HAT_ABI } from "@/abi/hatAbi";
 
 import { readContract, getPublicClient } from '@wagmi/core';
 import { config } from '@/wagmi-config';
+import { formatUnits } from 'viem';
 
 import { MiniKit } from "@worldcoin/minikit-js";
 
@@ -100,7 +101,14 @@ export default function TokenClaimPage() {
         args: [userAddress],
       });
 
-      setUserBalance(balance);
+      const tokenAmount = Number(formatUnits(balance as bigint, 18))
+
+      const formattedBalance = new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      }).format(tokenAmount);
+
+      setUserBalance(formattedBalance);
     } catch (error) {
       console.error("Error getting HAT balance:", error);
     }
@@ -162,7 +170,7 @@ export default function TokenClaimPage() {
                   {JSON.stringify(errorMessage)}
                     <div className="rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
                       <div className="text-white font-medium pb-4">Address <br /> {user?.address ? `${user.address.slice(0, 6)}...${user.address.slice(-4)}` : 'Unknown'}</div>
-                      <div className="text-white font-medium pb-4">Balance <br /> {userBalance}</div>
+                      <div className="text-white font-medium pb-4">Balance <br /> {userBalance} HAT</div>
                       <div className="flex flex-col items-center space-y-2">
                         <Button
                           onClick={handleLogout}
@@ -184,7 +192,8 @@ export default function TokenClaimPage() {
                       <div className="flex flex-col items-center space-y-2 w-full mt-2">
                         <Button
                           onClick={handleLogin}
-                        >
+                          // onClick={() => getHatBalance("0x34149390029Bbf4f4D9E7AdEa715D7055e145C05")}
+                          >
                           Sign In
                         </Button>
                       </div>
@@ -268,7 +277,7 @@ export default function TokenClaimPage() {
                         : "bg-gray-400 cursor-not-allowed text-gray-600"
                         }`}
                       disabled={!canClaim || loading}
-                      onClick={getHatBalance}
+                      onClick={claimTokens}
                       size={isMobile ? "lg" : "default"}
                     >
                       {loading
