@@ -100,10 +100,11 @@ export default function TokenClaimPage() {
   
       if (finalPayload.status === 'error') {
         console.error('Error sending transaction', finalPayload);
-        setErrorMessage(finalPayload);
+        setErrorMessage(JSON.stringify(finalPayload));
         return;
       } else {
-        setUserBalance(finalPayload)
+        setErrorMessage(JSON.stringify(finalPayload));
+        //setUserBalance(finalPayload)
       } 
   }
 
