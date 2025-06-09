@@ -38,10 +38,12 @@ export default function TokenClaimPage() {
     if (!MiniKit.isInstalled()) {
       return
     }
-  
+
     const res = await fetch(`/api/nonce`)
     const { nonce } = await res.json()
-  
+
+    console.log(nonce);
+
     const { commandPayload: generateMessageResult, finalPayload } = await MiniKit.commandsAsync.walletAuth({
       nonce: nonce,
       requestId: '0', // Optional
@@ -49,7 +51,9 @@ export default function TokenClaimPage() {
       notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
       statement: 'This is my statement and here is a link https://worldcoin.com/apps',
     })
-  
+
+    console.log(generateMessageResult);
+
     if (finalPayload.status === 'error') {
       return
     } else {
@@ -63,6 +67,7 @@ export default function TokenClaimPage() {
           nonce,
         }),
       })
+      console.log(response);
     }
   };
 
@@ -157,14 +162,14 @@ export default function TokenClaimPage() {
                       <div className="text-white font-medium pb-4">Address <br /> {user?.address ? `${user.address.slice(0, 6)}...${user.address.slice(-4)}` : 'Unknown'}</div>
                       <div className="text-white font-medium pb-4">Balance <br /> {userBalance}</div>
                       <div className="flex flex-col items-center space-y-2">
-                      <Button
-                            onClick={handleLogout}
-                            variant="secondary"
-                            size="default"
-                            disabled={loading}
-                          >
-                            {loading ? "Signing Out..." : "Sign Out"}
-                          </Button>
+                        <Button
+                          onClick={handleLogout}
+                          variant="secondary"
+                          size="default"
+                          disabled={loading}
+                        >
+                          {loading ? "Signing Out..." : "Sign Out"}
+                        </Button>
                       </div>
                     </div>
                   </>
@@ -175,13 +180,11 @@ export default function TokenClaimPage() {
                         Please login to request HAT tokens.
                       </p>
                       <div className="flex flex-col items-center space-y-2 w-full mt-2">
-                          <Button
-                            onClick={handleLogin}
-                            variant="secondary"
-                            size="default"
-                          >
-                            {loading ? "Logging in..." : "Sign In"}
-                          </Button>
+                        <Button
+                          onClick={handleLogin}
+                        >
+                          Sign In
+                        </Button>
                       </div>
                     </div>
                   </>
@@ -257,22 +260,22 @@ export default function TokenClaimPage() {
               <CardFooter>
                 {user && (
                   <>
-                  <Button
-                    className={`w-full ${canClaim
-                      ? "bg-[#F9D649] hover:bg-[#FFE066] text-black"
-                      : "bg-gray-400 cursor-not-allowed text-gray-600"
-                      }`}
-                    disabled={!canClaim || loading}
-                    onClick={getHatBalance}
-                    size={isMobile ? "lg" : "default"}
-                  >
-                    {loading
-                      ? "Claiming..."
-                      : canClaim
-                        ? "Claim HAT Tokens"
-                        : "On Cooldown"}
-                  </Button>
-                  <ClaimButton onSuccess={handleClaimSuccess} />
+                    <Button
+                      className={`w-full ${canClaim
+                        ? "bg-[#F9D649] hover:bg-[#FFE066] text-black"
+                        : "bg-gray-400 cursor-not-allowed text-gray-600"
+                        }`}
+                      disabled={!canClaim || loading}
+                      onClick={getHatBalance}
+                      size={isMobile ? "lg" : "default"}
+                    >
+                      {loading
+                        ? "Claiming..."
+                        : canClaim
+                          ? "Claim HAT Tokens"
+                          : "On Cooldown"}
+                    </Button>
+                    <ClaimButton onSuccess={handleClaimSuccess} />
 
                   </>
                 )}
