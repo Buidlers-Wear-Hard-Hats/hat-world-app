@@ -253,7 +253,6 @@ export default function TokenClaimPage() {
                         ? "Claim HAT Tokens"
                         : "On Cooldown"}
                   </Button><br/>
-                  <ClaimButton onSuccess={handleClaimSuccess} />
                   </>
                 )}
               </CardFooter>
