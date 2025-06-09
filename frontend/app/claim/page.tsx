@@ -23,7 +23,6 @@ export default function TokenClaimPage() {
   const [user, setUser] = useState<any | null>(null);
   const [userBalance, setUserBalance] = useState<any | null>(null);
   const [errorMessage, setErrorMessage] = useState<any | null>(null);
-  const [errorMessage2, setErrorMessage2] = useState<any | null>(null);
 
 
   const [lastClaim, setLastClaim] = useState<number | null>(null);
@@ -88,13 +87,12 @@ export default function TokenClaimPage() {
 
   const getHatBalance = async () => {
 
-    try {
       const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
         transaction: [
           {
-            address: '0xbA494aEa8295B5640Efb4FF9252df8D388e655dc',
+            address: "0x363a236ABea6c7d89F3E3E1A1E02C100E6FFAAF7",
             abi: HAT_ABI,
-            functionName: 'getHatBalance',
+            functionName: "getHatBalance",
             args: [],
           },
         ],
@@ -107,10 +105,6 @@ export default function TokenClaimPage() {
       } else {
         setUserBalance(finalPayload)
       } 
-    } catch (error) {
-      setErrorMessage2(error);
-
-    }
   }
 
   // Función para reclamar tokens
@@ -168,8 +162,6 @@ export default function TokenClaimPage() {
                 {user ? (
                   <>
                   {JSON.stringify(errorMessage)}
-                  "-------"
-                  {JSON.stringify(errorMessage2)}
                     <div className="rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
                       <div className="text-white font-medium pb-4">Address <br /> {user?.address ? `${user.address.slice(0, 6)}...${user.address.slice(-4)}` : 'Unknown'}</div>
                       <div className="text-white font-medium pb-4">Balance <br /> {userBalance}</div>
