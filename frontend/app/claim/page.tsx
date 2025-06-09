@@ -17,6 +17,7 @@ import { HAT_ABI } from "@/abi/hatAbi";
 
 import { MiniKit } from "@worldcoin/minikit-js";
 import { WalletAuthButton } from "@/components/wallet-auth-button";
+import { ClaimButton } from "@/components/ClaimButton";
 
 export default function TokenClaimPage() {
   const [user, setUser] = useState<any | null>(null);
@@ -95,6 +96,10 @@ export default function TokenClaimPage() {
         setClaimed(false);
       }, 3000);
     }, 1500);
+  };
+
+  const handleClaimSuccess = (txId: string) => {
+    console.log("Claim initiated with transaction ID:", txId);
   };
 
   // Función para actualizar el estado cuando finaliza el cooldown
@@ -213,6 +218,7 @@ export default function TokenClaimPage() {
               </CardContent>
               <CardFooter>
                 {user && (
+                  <>
                   <Button
                     className={`w-full ${canClaim
                       ? "bg-[#F9D649] hover:bg-[#FFE066] text-black"
@@ -228,6 +234,9 @@ export default function TokenClaimPage() {
                         ? "Claim HAT Tokens"
                         : "On Cooldown"}
                   </Button>
+                  <ClaimButton onSuccess={handleClaimSuccess} />
+
+                  </>
                 )}
               </CardFooter>
             </motion.div>
