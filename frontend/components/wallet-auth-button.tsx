@@ -4,11 +4,10 @@ import { signIn } from "next-auth/react";
 import { MiniKit } from "@worldcoin/minikit-js";
 
 interface WalletAuthButtonProps {
-  onSuccess?: () => void;
   onAuthSuccess?: (finalPayload: any) => void;
 }
 
-export function WalletAuthButton({ onSuccess, onAuthSuccess }: WalletAuthButtonProps) {
+export function WalletAuthButton({ onAuthSuccess }: WalletAuthButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleWalletAuth = async () => {
@@ -56,7 +55,6 @@ export function WalletAuthButton({ onSuccess, onAuthSuccess }: WalletAuthButtonP
 
         // Call onSuccess if provided
         if (onAuthSuccess) onAuthSuccess(finalPayload);
-        if (onSuccess) onSuccess();
       }
     } catch (error) {
       console.error("Wallet auth error:", error);
