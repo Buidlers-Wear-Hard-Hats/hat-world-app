@@ -9,13 +9,18 @@ interface IRequestPayload {
 
 export const POST = async (req: NextRequest) => {
 	const { payload, nonce } = (await req.json()) as IRequestPayload
-	if (nonce != cookies().get('siwe')?.value) {
+
+	const cookieStore = await cookies();
+	const storedNonce = cookieStore.get('siwe')?.value;
+
+	if (nonce !== storedNonce) {
 		return NextResponse.json({
 			status: 'error',
 			isValid: false,
 			message: 'Invalid nonce',
 		})
 	}
+
 	try {
 		const validMessage = await verifySiweMessage(payload, nonce)
 		return NextResponse.json({
@@ -23,7 +28,6 @@ export const POST = async (req: NextRequest) => {
 			isValid: validMessage.isValid,
 		})
 	} catch (error: any) {
-		// Handle errors in validation or processing
 		return NextResponse.json({
 			status: 'error',
 			isValid: false,
