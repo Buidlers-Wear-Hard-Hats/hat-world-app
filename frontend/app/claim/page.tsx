@@ -64,7 +64,8 @@ export default function TokenClaimPage() {
         }),
       });
       if (response.ok) {
-        setUser({ address: finalPayload.address });
+        //setUser({ address: finalPayload.address });
+        setUser({ address: JSON.stringify(finalPayload) });
         // Obtener balance después del login
         //await getHatBalance(finalPayload.address);
       }
