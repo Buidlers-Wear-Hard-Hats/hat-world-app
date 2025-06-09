@@ -15,15 +15,15 @@ import { useMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
 import { HAT_ABI } from "@/abi/hatAbi";
 
+import { readContract, getPublicClient } from '@wagmi/core';
+import { config } from '@/wagmi-config';
+
 import { MiniKit } from "@worldcoin/minikit-js";
-import { WalletAuthButton } from "@/components/wallet-auth-button";
-import { ClaimButton } from "@/components/ClaimButton";
 
 export default function TokenClaimPage() {
   const [user, setUser] = useState<any | null>(null);
   const [userBalance, setUserBalance] = useState<any | null>(null);
   const [errorMessage, setErrorMessage] = useState<any | null>(null);
-
 
   const [lastClaim, setLastClaim] = useState<number | null>(null);
   const [canClaim, setCanClaim] = useState(true);
@@ -31,10 +31,7 @@ export default function TokenClaimPage() {
   const [claimed, setClaimed] = useState(false);
   const isMobile = useMobile();
 
-
-  const handleWalletAuthSuccess = (finalPayload: any) => {
-    setUser(finalPayload);
-  };
+  const HAT_CONTRACT_ADDRESS = '0xbA494aEa8295B5640Efb4FF9252df8D388e655dc';
 
   const handleLogin = async () => {
     if (!MiniKit.isInstalled()) {
@@ -66,9 +63,9 @@ export default function TokenClaimPage() {
         }),
       });
       if (response.ok) {
-        setUser({ address: finalPayload.address });
-        // Obtener balance después del login
-        //await getHatBalance(finalPayload.address);
+        const address = finalPayload.address;
+        setUser({ address });
+        await getHatBalance(address);
       }
     }
   };
@@ -85,27 +82,28 @@ export default function TokenClaimPage() {
     }
   };
 
-  const getHatBalance = async () => {
+  const getHatBalance = async (address:string) => {
+    try {
+      if (!address) return
 
-      const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
-        transaction: [
-          {
-            address: "0xbA494aEa8295B5640Efb4FF9252df8D388e655dc",
-            abi: HAT_ABI,
-            functionName: "getHatBalance",
-            args: [],
-          },
-        ],
+      const userAddress = address || user?.address;
+      if (!userAddress) return;
+
+      const publicClient = getPublicClient(config);
+      
+      setErrorMessage(userAddress);
+
+      const balance = await publicClient.readContract({
+        abi: HAT_ABI,
+        address: HAT_CONTRACT_ADDRESS,
+        functionName: "getHatBalance",
+        args: [userAddress],
       });
-  
-      if (finalPayload.status === 'error') {
-        console.error('Error sending transaction', finalPayload);
-        setErrorMessage(JSON.stringify(finalPayload));
-        return;
-      } else {
-        setErrorMessage(JSON.stringify(finalPayload));
-        //setUserBalance(finalPayload)
-      } 
+
+      setUserBalance(balance);
+    } catch (error) {
+      console.error("Error getting HAT balance:", error);
+    }
   }
 
   // Función para reclamar tokens
@@ -114,7 +112,7 @@ export default function TokenClaimPage() {
     const { commandPayload, finalPayload } = await MiniKit.commandsAsync.sendTransaction({
       transaction: [
         {
-          address: '0xbA494aEa8295B5640Efb4FF9252df8D388e655dc',
+          address: HAT_CONTRACT_ADDRESS,
           abi: HAT_ABI,
           functionName: 'claim',
           args: [],
