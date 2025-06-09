@@ -90,7 +90,7 @@ export default function TokenClaimPage() {
       const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
         transaction: [
           {
-            address: "0x363a236ABea6c7d89F3E3E1A1E02C100E6FFAAF7",
+            address: "0xbA494aEa8295B5640Efb4FF9252df8D388e655dc",
             abi: HAT_ABI,
             functionName: "getHatBalance",
             args: [],
