@@ -179,7 +179,6 @@ export default function TokenClaimPage() {
                             onClick={signInWithWallet}
                             variant="secondary"
                             size="default"
-                            disabled={loading}
                           >
                             {loading ? "Logging in..." : "Sign In"}
                           </Button>
