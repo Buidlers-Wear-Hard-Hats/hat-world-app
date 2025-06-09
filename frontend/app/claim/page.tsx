@@ -42,8 +42,6 @@ export default function TokenClaimPage() {
     const res = await fetch(`/api/nonce`)
     const { nonce } = await res.json()
 
-    console.log(nonce);
-
     const { commandPayload: generateMessageResult, finalPayload } = await MiniKit.commandsAsync.walletAuth({
       nonce: nonce,
       requestId: '0', // Optional
@@ -51,8 +49,6 @@ export default function TokenClaimPage() {
       notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
       statement: 'This is my statement and here is a link https://worldcoin.com/apps',
     })
-
-    console.log(generateMessageResult);
 
     if (finalPayload.status === 'error') {
       return
@@ -66,8 +62,12 @@ export default function TokenClaimPage() {
           payload: finalPayload,
           nonce,
         }),
-      })
-      console.log(response);
+      });
+      if (response.ok) {
+        setUser({ address: finalPayload.address });
+        // Obtener balance después del login
+        //await getHatBalance(finalPayload.address);
+      }
     }
   };
 
