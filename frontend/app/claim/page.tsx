@@ -22,6 +22,9 @@ import { ClaimButton } from "@/components/ClaimButton";
 export default function TokenClaimPage() {
   const [user, setUser] = useState<any | null>(null);
   const [userBalance, setUserBalance] = useState<any | null>(null);
+  const [errorMessage, setErrorMessage] = useState<any | null>(null);
+  const [errorMessage2, setErrorMessage2] = useState<any | null>(null);
+
 
   const [lastClaim, setLastClaim] = useState<number | null>(null);
   const [canClaim, setCanClaim] = useState(true);
@@ -64,8 +67,7 @@ export default function TokenClaimPage() {
         }),
       });
       if (response.ok) {
-        //setUser({ address: finalPayload.address });
-        setUser({ address: JSON.stringify(finalPayload) });
+        setUser({ address: finalPayload.address });
         // Obtener balance después del login
         //await getHatBalance(finalPayload.address);
       }
@@ -86,22 +88,28 @@ export default function TokenClaimPage() {
 
   const getHatBalance = async () => {
 
-    const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
-      transaction: [
-        {
-          address: '0xbA494aEa8295B5640Efb4FF9252df8D388e655dc',
-          abi: HAT_ABI,
-          functionName: 'getHatBalance',
-          args: [],
-        },
-      ],
-    });
+    try {
+      const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
+        transaction: [
+          {
+            address: '0xbA494aEa8295B5640Efb4FF9252df8D388e655dc',
+            abi: HAT_ABI,
+            functionName: 'getHatBalance',
+            args: [],
+          },
+        ],
+      });
+  
+      if (finalPayload.status === 'error') {
+        console.error('Error sending transaction', finalPayload);
+        setErrorMessage(finalPayload);
+        return;
+      } else {
+        setUserBalance(finalPayload)
+      } 
+    } catch (error) {
+      setErrorMessage2(error);
 
-    if (finalPayload.status === 'error') {
-      console.error('Error sending transaction', finalPayload);
-      return;
-    } else {
-      setUserBalance(finalPayload)
     }
   }
 
@@ -159,9 +167,11 @@ export default function TokenClaimPage() {
               <CardTitle className="text-sm font-bold text-[#F5AD00] ">
                 {user ? (
                   <>
+                  {JSON.stringify(errorMessage)}
+                  "-------"
+                  {JSON.stringify(errorMessage2)}
                     <div className="rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
-                    <div className="text-white font-medium pb-4">Address <br /> {user?.address ? `${user.address}` : 'Unknown'}</div>
-                      {/* <div className="text-white font-medium pb-4">Address <br /> {user?.address ? `${user.address.slice(0, 6)}...${user.address.slice(-4)}` : 'Unknown'}</div> */}
+                      <div className="text-white font-medium pb-4">Address <br /> {user?.address ? `${user.address.slice(0, 6)}...${user.address.slice(-4)}` : 'Unknown'}</div>
                       <div className="text-white font-medium pb-4">Balance <br /> {userBalance}</div>
                       <div className="flex flex-col items-center space-y-2">
                         <Button
@@ -277,8 +287,6 @@ export default function TokenClaimPage() {
                           ? "Claim HAT Tokens"
                           : "On Cooldown"}
                     </Button>
-                    <ClaimButton onSuccess={handleClaimSuccess} />
-
                   </>
                 )}
               </CardFooter>
