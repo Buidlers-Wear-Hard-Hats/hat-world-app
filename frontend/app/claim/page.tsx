@@ -22,6 +22,7 @@ import { WalletAuthButton } from "@/components/wallet-auth-button";
 export default function TokenClaimPage() {
   const [user, setUser] = useState<any | null>(null);
   const [userBalance, setUserBalance] = useState<any | null>(null);
+  const [walletConnected, setWalletConnected] = useState(false);
 
   const [lastClaim, setLastClaim] = useState<number | null>(null);
   const [canClaim, setCanClaim] = useState(true);
@@ -47,6 +48,11 @@ export default function TokenClaimPage() {
     refreshUserData();
   }, [refreshUserData]);
 
+
+  const handleWalletConnected = () => {
+    setWalletConnected(true);
+    console.log("Wallet connected");
+  };
 
   const handleWalletAuthSuccess = (finalPayload: any) => {
     setUser(finalPayload);
@@ -135,6 +141,7 @@ export default function TokenClaimPage() {
                 {user ? (
                   <>
                     <div className="rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
+                      <div className="text-white font-medium pb-4">Username <br /> {user?.username ? user.username : 'Unknown'}</div>
                       <div className="text-white font-medium pb-4">Address <br /> {user?.address ? `${user.address.slice(0, 6)}...${user.walletAddress.slice(-4)}` : 'Unknown'}</div>
                       <div className="text-white font-medium pb-4">Balance <br /> {userBalance}</div>
                       <div className="flex flex-col items-center space-y-2">
@@ -157,7 +164,7 @@ export default function TokenClaimPage() {
                       </p>
                       <div className="flex flex-col items-center space-y-2 w-full mt-2">
                         {!user &&
-                          <WalletAuthButton onAuthSuccess={handleWalletAuthSuccess} />  
+                          <WalletAuthButton onSuccess={handleWalletConnected} onAuthSuccess={handleWalletAuthSuccess} />  
                         }
                       </div>
                     </div>
