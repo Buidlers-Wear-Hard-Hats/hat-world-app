@@ -15,7 +15,6 @@ import Countdown from "@/components/countdown";
 import { useMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
 import { HAT_ABI } from "@/abi/hatAbi";
-import { ClaimButton } from "@/components/ClaimButton";
 
 import { MiniKit } from "@worldcoin/minikit-js";
 import { WalletAuthButton } from "@/components/wallet-auth-button";
@@ -48,9 +47,6 @@ export default function TokenClaimPage() {
     refreshUserData();
   }, [refreshUserData]);
 
-  const handleClaimSuccess = (txId: string) => {
-    console.log("Claim initiated with transaction ID:", txId);
-  };
 
   const handleWalletAuthSuccess = (finalPayload: any) => {
     setUser(finalPayload);
@@ -237,7 +233,6 @@ export default function TokenClaimPage() {
               </CardContent>
               <CardFooter>
                 {user && (
-                  <>
                   <Button
                     className={`w-full ${canClaim
                       ? "bg-[#F9D649] hover:bg-[#FFE066] text-black"
@@ -252,8 +247,7 @@ export default function TokenClaimPage() {
                       : canClaim
                         ? "Claim HAT Tokens"
                         : "On Cooldown"}
-                  </Button><br/>
-                  </>
+                  </Button>
                 )}
               </CardFooter>
             </motion.div>
