@@ -10,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Coins } from "lucide-react";
 import Countdown from "@/components/countdown";
 import { useMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
@@ -22,7 +21,6 @@ import { WalletAuthButton } from "@/components/wallet-auth-button";
 export default function TokenClaimPage() {
   const [user, setUser] = useState<any | null>(null);
   const [userBalance, setUserBalance] = useState<any | null>(null);
-  const [walletConnected, setWalletConnected] = useState(false);
 
   const [lastClaim, setLastClaim] = useState<number | null>(null);
   const [canClaim, setCanClaim] = useState(true);
@@ -30,29 +28,6 @@ export default function TokenClaimPage() {
   const [claimed, setClaimed] = useState(false);
   const isMobile = useMobile();
 
-  const refreshUserData = useCallback(async () => {
-    try {
-      const response = await fetch('/api/auth/me');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.user) {
-          setUser(data.user);
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    refreshUserData();
-  }, [refreshUserData]);
-
-
-  const handleWalletConnected = () => {
-    setWalletConnected(true);
-    console.log("Wallet connected");
-  };
 
   const handleWalletAuthSuccess = (finalPayload: any) => {
     setUser(finalPayload);
@@ -121,6 +96,7 @@ export default function TokenClaimPage() {
       }, 3000);
     }, 1500);
   };
+
   // Función para actualizar el estado cuando finaliza el cooldown
   const handleCooldownComplete = () => {
     setCanClaim(true);
@@ -141,8 +117,7 @@ export default function TokenClaimPage() {
                 {user ? (
                   <>
                     <div className="rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
-                      <div className="text-white font-medium pb-4">Username <br /> {user?.username ? user.username : 'Unknown'}</div>
-                      <div className="text-white font-medium pb-4">Address <br /> {user?.address ? `${user.address.slice(0, 6)}...${user.walletAddress.slice(-4)}` : 'Unknown'}</div>
+                      <div className="text-white font-medium pb-4">Address <br /> {user?.address ? `${user.address.slice(0, 6)}...${user.address.slice(-4)}` : 'Unknown'}</div>
                       <div className="text-white font-medium pb-4">Balance <br /> {userBalance}</div>
                       <div className="flex flex-col items-center space-y-2">
                       <Button
@@ -163,9 +138,7 @@ export default function TokenClaimPage() {
                         Please login to request HAT tokens.
                       </p>
                       <div className="flex flex-col items-center space-y-2 w-full mt-2">
-                        {!user &&
-                          <WalletAuthButton onSuccess={handleWalletConnected} onAuthSuccess={handleWalletAuthSuccess} />  
-                        }
+                          <WalletAuthButton onAuthSuccess={handleWalletAuthSuccess} />  
                       </div>
                     </div>
                   </>
