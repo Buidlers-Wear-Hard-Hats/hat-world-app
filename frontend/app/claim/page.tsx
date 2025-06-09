@@ -34,7 +34,7 @@ export default function TokenClaimPage() {
     setUser(finalPayload);
   };
 
-  const signInWithWallet = async () => {
+  const handleLogin = async () => {
     if (!MiniKit.isInstalled()) {
       return
     }
@@ -176,7 +176,7 @@ export default function TokenClaimPage() {
                       </p>
                       <div className="flex flex-col items-center space-y-2 w-full mt-2">
                           <Button
-                            onClick={signInWithWallet}
+                            onClick={handleLogin}
                             variant="secondary"
                             size="default"
                           >
