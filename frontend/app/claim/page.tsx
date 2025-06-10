@@ -24,7 +24,7 @@ import { MiniKit } from "@worldcoin/minikit-js";
 export default function TokenClaimPage() {
   const [user, setUser] = useState<any | null>(null);
   const [userBalance, setUserBalance] = useState<any | null>(null);
-  const [errorMessage, setErrorMessage] = useState<any | null>(null);
+  const [isValidate, setIsValidate] = useState<any | null>(false);
 
   const [lastClaim, setLastClaim] = useState<number | null>(null);
   const [canClaim, setCanClaim] = useState(true);
@@ -83,7 +83,7 @@ export default function TokenClaimPage() {
     }
   };
 
-  const getHatBalance = async (address:string) => {
+  const getHatBalance = async (address: string) => {
     try {
       if (!address) return
 
@@ -91,8 +91,6 @@ export default function TokenClaimPage() {
       if (!userAddress) return;
 
       const publicClient = getPublicClient(config);
-      
-      setErrorMessage(userAddress);
 
       const balance = await publicClient.readContract({
         abi: HAT_ABI,
@@ -167,7 +165,6 @@ export default function TokenClaimPage() {
               <CardTitle className="text-sm font-bold text-[#F5AD00] ">
                 {user ? (
                   <>
-                  {JSON.stringify(errorMessage)}
                     <div className="rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
                       <div className="text-white font-medium pb-4">Address <br /> {user?.address ? `${user.address.slice(0, 6)}...${user.address.slice(-4)}` : 'Unknown'}</div>
                       <div className="text-white font-medium pb-4">Balance <br /> {userBalance} HAT</div>
@@ -192,8 +189,8 @@ export default function TokenClaimPage() {
                       <div className="flex flex-col items-center space-y-2 w-full mt-2">
                         <Button
                           onClick={handleLogin}
-                          // onClick={() => getHatBalance("0x34149390029Bbf4f4D9E7AdEa715D7055e145C05")}
-                          >
+                        // onClick={() => getHatBalance("0x34149390029Bbf4f4D9E7AdEa715D7055e145C05")}
+                        >
                           Sign In
                         </Button>
                       </div>
@@ -271,21 +268,31 @@ export default function TokenClaimPage() {
               <CardFooter>
                 {user && (
                   <>
-                    <Button
-                      className={`w-full ${canClaim
-                        ? "bg-[#F9D649] hover:bg-[#FFE066] text-black"
-                        : "bg-gray-400 cursor-not-allowed text-gray-600"
-                        }`}
-                      disabled={!canClaim || loading}
-                      onClick={claimTokens}
-                      size={isMobile ? "lg" : "default"}
-                    >
-                      {loading
-                        ? "Claiming..."
-                        : canClaim
-                          ? "Claim HAT Tokens"
-                          : "On Cooldown"}
-                    </Button>
+                    {isValidate ?
+                      <Button
+                        className={`w-full ${canClaim
+                          ? "bg-[#F9D649] hover:bg-[#FFE066] text-black"
+                          : "bg-gray-400 cursor-not-allowed text-gray-600"
+                          }`}
+                        disabled={!canClaim || loading}
+                        onClick={claimTokens}
+                        size={isMobile ? "lg" : "default"}
+                      >
+                        {loading
+                          ? "Claiming..."
+                          : canClaim
+                            ? "Claim HAT Tokens"
+                            : "On Cooldown"}
+                      </Button>
+                      :
+                      <Button
+                        className={`w-full bg-[#F9D649] hover:bg-[#FFE066] text-black`}
+                        disabled={!isValidate}
+                        size={isMobile ? "lg" : "default"}
+                      >
+                        You need to verify your account to claim HAT
+                      </Button>
+                    }
                   </>
                 )}
               </CardFooter>
