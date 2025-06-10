@@ -31,6 +31,12 @@ const walletAuthInput = (nonce: string): WalletAuthInput => {
     };
 };
 
+type User = {
+  walletAddress: string;
+  username: string | null;
+  profilePictureUrl: string | null;
+};
+
 export default function TokenClaimPage() {
   const [user, setUser] = useState<any | null>(null);
   const [userBalance, setUserBalance] = useState<any | null>(null);
@@ -86,9 +92,7 @@ export default function TokenClaimPage() {
         });
 
         if (response.status === 200) {
-          const user = MiniKit.user;
-          setUser(user);
-          await getHatBalance(user.walletAddress as string);
+          setUser(MiniKit.user)
         }
         setLoading(false);
       }
@@ -309,7 +313,7 @@ export default function TokenClaimPage() {
               <CardFooter>
                 {user && (
                   <>
-                    {!isValidate ?
+                    {isValidate ?
                       <Button
                         className={`w-full ${canClaim
                           ? "bg-[#F9D649] hover:bg-[#FFE066] text-black"
