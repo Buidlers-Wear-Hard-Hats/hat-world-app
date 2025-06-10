@@ -99,6 +99,17 @@ export default function TokenClaimPage() {
         args: [userAddress],
       });
 
+      const verifyAccount = await publicClient.readContract({
+        abi: HAT_ABI,
+        address: HAT_CONTRACT_ADDRESS,
+        functionName: "getAddressVerification",
+        args: [userAddress],
+      });
+
+      const validateAccount = verifyAccount as number > 0 ? true : false;
+
+      setIsValidate(validateAccount);
+
       const tokenAmount = Number(formatUnits(balance as bigint, 18))
 
       const formattedBalance = new Intl.NumberFormat('en-US', {
@@ -107,6 +118,7 @@ export default function TokenClaimPage() {
       }).format(tokenAmount);
 
       setUserBalance(formattedBalance);
+
     } catch (error) {
       console.error("Error getting HAT balance:", error);
     }
@@ -188,8 +200,9 @@ export default function TokenClaimPage() {
                       </p>
                       <div className="flex flex-col items-center space-y-2 w-full mt-2">
                         <Button
-                          onClick={handleLogin}
-                        // onClick={() => getHatBalance("0x34149390029Bbf4f4D9E7AdEa715D7055e145C05")}
+                        onClick={handleLogin}
+                        //onClick={() => getHatBalance("0x9ca7daf242add9e11c31c99cec8a51ce70a4e815")}
+                        //onClick={() => getHatBalance("0x34149390029Bbf4f4D9E7AdEa715D7055e145C05")}
                         >
                           Sign In
                         </Button>
@@ -290,7 +303,7 @@ export default function TokenClaimPage() {
                         disabled={!isValidate}
                         size={isMobile ? "lg" : "default"}
                       >
-                        You need to verify your account to claim HAT
+                        You need verify your World account to claim HAT
                       </Button>
                     }
                   </>
