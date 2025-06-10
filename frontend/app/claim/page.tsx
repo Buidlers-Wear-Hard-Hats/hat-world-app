@@ -15,11 +15,27 @@ import { useMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
 import { HAT_ABI } from "@/abi/hatAbi";
 
-import { readContract, getPublicClient } from '@wagmi/core';
+import { getPublicClient } from '@wagmi/core';
 import { config } from '@/wagmi-config';
 import { formatUnits } from 'viem';
 
-import { MiniKit } from "@worldcoin/minikit-js";
+import { MiniKit, WalletAuthInput } from "@worldcoin/minikit-js";
+
+const walletAuthInput = (nonce: string): WalletAuthInput => {
+    return {
+        nonce,
+        requestId: "0",
+        expirationTime: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+        notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
+        statement: "This is my statement and here is a link https://worldcoin.com/apps",
+    };
+};
+
+type User = {
+  walletAddress: string;
+  username: string | null;
+  profilePictureUrl: string | null;
+};
 
 export default function TokenClaimPage() {
   const [user, setUser] = useState<any | null>(null);
@@ -34,42 +50,95 @@ export default function TokenClaimPage() {
 
   const HAT_CONTRACT_ADDRESS = '0xbA494aEa8295B5640Efb4FF9252df8D388e655dc';
 
-  const handleLogin = async () => {
-    if (!MiniKit.isInstalled()) {
-      return
-    }
-
-    const res = await fetch(`/api/nonce`)
-    const { nonce } = await res.json()
-
-    const { commandPayload: generateMessageResult, finalPayload } = await MiniKit.commandsAsync.walletAuth({
-      nonce: nonce,
-      requestId: '0', // Optional
-      expirationTime: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-      notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
-      statement: 'This is my statement and here is a link https://worldcoin.com/apps',
-    })
-
-    if (finalPayload.status === 'error') {
-      return
-    } else {
-      const response = await fetch('/api/complete-siwe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          payload: finalPayload,
-          nonce,
-        }),
-      });
+  const refreshUserData = useCallback(async () => {
+    try {
+      const response = await fetch('/api/auth/me');
       if (response.ok) {
-        const address = finalPayload.address;
-        setUser({ address });
-        await getHatBalance(address);
+        const data = await response.json();
+        if (data.user) {
+          setUser(data.user);
+        }
       }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshUserData();
+  }, [refreshUserData]);
+
+  const handleLogin = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/nonce`);
+      const { nonce } = await res.json();
+
+      const { finalPayload } = await MiniKit.commandsAsync.walletAuth(walletAuthInput(nonce));
+
+      if (finalPayload.status === 'error') {
+        setLoading(false);
+        return;
+      } else {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            payload: finalPayload,
+            nonce,
+          }),
+        });
+
+        if (response.status === 200) {
+          setUser(MiniKit.user)
+        }
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setLoading(false);
     }
   };
+
+  // const handleLogin = async () => {
+  //   if (!MiniKit.isInstalled()) {
+  //     return
+  //   }
+
+  //   const res = await fetch(`/api/nonce`)
+  //   const { nonce } = await res.json()
+
+  //   const { commandPayload: generateMessageResult, finalPayload } = await MiniKit.commandsAsync.walletAuth({
+  //     nonce: nonce,
+  //     requestId: '0', // Optional
+  //     expirationTime: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+  //     notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
+  //     statement: 'This is my statement and here is a link https://worldcoin.com/apps',
+  //   })
+
+  //   if (finalPayload.status === 'error') {
+  //     return
+  //   } else {
+  //     const response = await fetch('/api/complete-siwe', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         payload: finalPayload,
+  //         nonce,
+  //       }),
+  //     });
+  //     if (response.ok) {
+  //       const address = finalPayload.address;
+  //       localStorage.setItem('userAddress', address);
+  //       setUser({ address });
+  //       await getHatBalance(address);
+  //     }
+  //   }
+  // };
 
   const handleLogout = async () => {
     try {
@@ -178,6 +247,7 @@ export default function TokenClaimPage() {
                 {user ? (
                   <>
                     <div className="rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
+                    {JSON.stringify(user)}
                       <div className="text-white font-medium pb-4">Address <br /> {user?.address ? `${user.address.slice(0, 6)}...${user.address.slice(-4)}` : 'Unknown'}</div>
                       <div className="text-white font-medium pb-4">Balance <br /> {userBalance} HAT</div>
                       <div className="flex flex-col items-center space-y-2">
@@ -200,7 +270,7 @@ export default function TokenClaimPage() {
                       </p>
                       <div className="flex flex-col items-center space-y-2 w-full mt-2">
                         <Button
-                        onClick={handleLogin}
+                          onClick={handleLogin}
                         //onClick={() => getHatBalance("0x9ca7daf242add9e11c31c99cec8a51ce70a4e815")}
                         //onClick={() => getHatBalance("0x34149390029Bbf4f4D9E7AdEa715D7055e145C05")}
                         >
