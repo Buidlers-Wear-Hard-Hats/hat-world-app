@@ -35,6 +35,7 @@ export default function TokenClaimPage() {
   const [user, setUser] = useState<any | null>(null);
   const [userBalance, setUserBalance] = useState<any | null>(null);
   const [isValidate, setIsValidate] = useState<any | null>(false);
+  const [error, setError] = useState<any | null>(null);
 
   const [lastClaim, setLastClaim] = useState<number | null>(null);
   const [canClaim, setCanClaim] = useState(true);
@@ -46,7 +47,9 @@ export default function TokenClaimPage() {
 
   const refreshUserData = useCallback(async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch('/api/auth/me',{
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         if (data.user) {
@@ -83,6 +86,7 @@ export default function TokenClaimPage() {
             payload: finalPayload,
             nonce,
           }),
+          credentials: 'include',
         });
 
         if (response.status === 200) {
@@ -202,7 +206,7 @@ export default function TokenClaimPage() {
           <Card className="w-full max-w-md bg-[#2C2C5A] text-black shadow-xl border-0 mb-1">
             <CardHeader className="text-center">
               <CardTitle className="text-sm font-bold text-[#F5AD00] ">
-                {user?.walletAddress ? (
+                {user ? (
                   <>
                     <div className="rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
                       <div className="text-white font-medium pb-4">Address <br /> {user?.walletAddress ? `${user.walletAddress.slice(0, 6)}...${user.walletAddress.slice(-4)}` : 'Unknown'}</div>
