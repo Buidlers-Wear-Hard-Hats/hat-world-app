@@ -8,9 +8,9 @@ async function getUserById(userId: string) {
 
     return {
         id: userId,
-        walletAddress: "",
-        username: "",
-        profilePictureUrl: "",
+        walletAddress: null,
+        username: null,
+        profilePictureUrl: null,
         isNewUser: false
     };
 }

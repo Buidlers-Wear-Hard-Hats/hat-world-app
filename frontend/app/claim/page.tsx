@@ -31,12 +31,6 @@ const walletAuthInput = (nonce: string): WalletAuthInput => {
     };
 };
 
-type User = {
-  walletAddress: string;
-  username: string | null;
-  profilePictureUrl: string | null;
-};
-
 export default function TokenClaimPage() {
   const [user, setUser] = useState<any | null>(null);
   const [userBalance, setUserBalance] = useState<any | null>(null);
@@ -208,7 +202,7 @@ export default function TokenClaimPage() {
           <Card className="w-full max-w-md bg-[#2C2C5A] text-black shadow-xl border-0 mb-1">
             <CardHeader className="text-center">
               <CardTitle className="text-sm font-bold text-[#F5AD00] ">
-                {user ? (
+                {user.walletAddress ? (
                   <>
                     <div className="rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
                     {JSON.stringify(user)}
