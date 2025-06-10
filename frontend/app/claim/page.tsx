@@ -202,7 +202,7 @@ export default function TokenClaimPage() {
           <Card className="w-full max-w-md bg-[#2C2C5A] text-black shadow-xl border-0 mb-1">
             <CardHeader className="text-center">
               <CardTitle className="text-sm font-bold text-[#F5AD00] ">
-                {user?.walletAddress ? (
+                {user ? (
                   <>
                     <div className="rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
                     {JSON.stringify(user)}
@@ -309,7 +309,7 @@ export default function TokenClaimPage() {
               <CardFooter>
                 {user && (
                   <>
-                    {isValidate ?
+                    {!isValidate ?
                       <Button
                         className={`w-full ${canClaim
                           ? "bg-[#F9D649] hover:bg-[#FFE066] text-black"
