@@ -138,7 +138,8 @@ export default function TokenClaimPage() {
 
       const validateAccount = verifyAccount as number > 0 ? true : false;
 
-      setIsValidate(validateAccount);
+      //setIsValidate(validateAccount);
+      setIsValidate(true);
 
       const tokenAmount = Number(formatUnits(balance as bigint, 18))
 
@@ -174,7 +175,7 @@ export default function TokenClaimPage() {
 
     const now = Date.now();
     const timeElapsed = now - lastClaimTime;
-    const cooldownPeriod = 1 * 60 * 60 * 1000;
+    const cooldownPeriod = 24 * 60 * 60 * 1000;
 
     if (timeElapsed < cooldownPeriod) {
       setCanClaim(false);
@@ -216,8 +217,6 @@ export default function TokenClaimPage() {
     }
   };
 
-
-  // Función para actualizar el estado cuando finaliza el cooldown
   const handleCooldownComplete = () => {
     setCanClaim(true);
   };
@@ -259,8 +258,6 @@ export default function TokenClaimPage() {
                       <div className="flex flex-col items-center space-y-2 w-full mt-2">
                         <Button
                           onClick={handleLogin}
-                        //onClick={() => getHatBalance("0x9ca7daf242add9e11c31c99cec8a51ce70a4e815")}
-                        //onClick={() => getHatBalance("0x34149390029Bbf4f4D9E7AdEa715D7055e145C05")}
                         >
                           Sign In
                         </Button>
@@ -316,7 +313,7 @@ export default function TokenClaimPage() {
                   <div className="mb-6">
                     <p className="mb-2 text-[#F5AD00]">Time left to claim:</p>
                     <Countdown
-                      targetDate={lastClaim + 1 * 60 * 60 * 1000}
+                      targetDate={lastClaim + 24 * 60 * 60 * 1000}
                       onComplete={handleCooldownComplete}
                     />
                   </div>
@@ -339,7 +336,7 @@ export default function TokenClaimPage() {
               <CardFooter>
                 {user && (
                   <>
-                    {!isValidate ?
+                    {isValidate ?
                       <Button
                         className={`w-full ${canClaim
                           ? "bg-[#F9D649] hover:bg-[#FFE066] text-black"
