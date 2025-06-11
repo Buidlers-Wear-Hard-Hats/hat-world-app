@@ -65,42 +65,85 @@ export default function TokenClaimPage() {
     refreshUserData();
   }, [refreshUserData]);
 
+  // const handleLogin = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const res = await fetch(`/api/nonce`);
+  //     const { nonce } = await res.json();
+
+  //     const { finalPayload } = await MiniKit.commandsAsync.walletAuth(walletAuthInput(nonce));
+
+  //     if (finalPayload.status === 'error') {
+  //       setLoading(false);
+  //       return;
+  //     } else {
+  //       const response = await fetch('/api/auth/login', {
+  //         method: 'POST',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //         },
+  //         body: JSON.stringify({
+  //           payload: finalPayload,
+  //           nonce,
+  //         }),
+  //         credentials: 'include',
+  //       });
+
+  //       if (response.status === 200) {
+  //         const user = MiniKit.user;
+  //         setUser(user);
+  //         await getHatBalance(user.walletAddress as string);
+  //       }
+  //       setLoading(false);
+  //     }
+  //   } catch (error) {
+  //     console.error("Login error:", error);
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleLogin = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(`/api/nonce`);
-      const { nonce } = await res.json();
-
-      const { finalPayload } = await MiniKit.commandsAsync.walletAuth(walletAuthInput(nonce));
-
-      if (finalPayload.status === 'error') {
-        setLoading(false);
-        return;
-      } else {
-        const response = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            payload: finalPayload,
-            nonce,
-          }),
-          credentials: 'include',
-        });
-
-        if (response.status === 200) {
-          const user = MiniKit.user;
-          setUser(user);
-          await getHatBalance(user.walletAddress as string);
-        }
-        setLoading(false);
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      setLoading(false);
+    if (!MiniKit.isInstalled()) {
+      return
     }
-  };
+  
+    setLoading(true);
+    const res = await fetch(`/api/nonce`)
+    const { nonce } = await res.json()
+  
+    const { commandPayload: generateMessageResult, finalPayload } = await MiniKit.commandsAsync.walletAuth({
+      nonce: nonce,
+      requestId: '0', // Optional
+      expirationTime: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+      notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
+      statement: 'This is my statement and here is a link https://worldcoin.com/apps',
+    })
+  
+    if (finalPayload.status === 'error') {
+      setLoading(false);
+      return
+    } else {
+      const response = await fetch('/api/complete-siwe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          payload: finalPayload,
+          nonce,
+        }),
+      });
+
+      if (response.status === 200) {
+        const user = MiniKit.user;
+        setUser(user);
+        await getHatBalance(user.walletAddress as string);
+      }
+      setLoading(false);
+      await getHatBalance(user.walletAddress as string);
+
+    }
+  }
 
   const handleLogout = async () => {
     try {
