@@ -5,14 +5,20 @@ import { Navbar } from '@/components/navbar'
 import { MiniKit, WalletAuthInput } from "@worldcoin/minikit-js";
 import { useCallback, useEffect, useState } from "react";
 
-const [loading, setLoading] = useState(false);
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+
+  const [loading, setLoading] = useState(false);
 const [user, setUser] = useState<any | null>(null);
 
-export const metadata: Metadata = {
-  title: 'Hat App',
-  description: 'Hat Token App',
-  generator: 'Open Web Academy',
-}
+// const metadata: Metadata = {
+//   title: 'Hat App',
+//   description: 'Hat Token App',
+//   generator: 'Open Web Academy',
+// }
 
 const walletAuthInput = (nonce: string): WalletAuthInput => {
   return {
@@ -80,11 +86,6 @@ const handleLogin = async () => {
   }
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
   return (
     <html lang="en">
       <MiniKitProvider>
