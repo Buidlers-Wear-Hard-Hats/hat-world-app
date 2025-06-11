@@ -34,24 +34,30 @@ contract TreasuryHATv1 is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         claimInterval = _claimInterval; // 3600 = 1H
     }
 
-    function getHatBalance() external view returns (uint256) {
-        return IExternalContract(0xCA981aD7C6425298D13A3006615dAeaE5AE952D3).balanceOf(msg.sender);
+    function getHatBalance(address sender) external view returns (uint256) {
+        return IExternalContract(0xCA981aD7C6425298D13A3006615dAeaE5AE952D3).balanceOf(sender);
     }
 
-    function getAddressVerification() external view returns (uint256) {
-        return IExternalContract(0x57b930D551e677CC36e2fA036Ae2fe8FdaE0330D).addressVerifiedUntil(msg.sender);
+    function getAddressVerification(address sender) external view returns (uint256) {
+        return IExternalContract(0x57b930D551e677CC36e2fA036Ae2fe8FdaE0330D).addressVerifiedUntil(sender);
     }
 
     function claim() external {
         require(
-            IExternalContract(0x57b930D551e677CC36e2fA036Ae2fe8FdaE0330D).addressVerifiedUntil(msg.sender) > 0,
-            "Address not verified"
+           IExternalContract(0x57b930D551e677CC36e2fA036Ae2fe8FdaE0330D).addressVerifiedUntil(msg.sender) > 0,
+           "Address not verified"
         );
 
         require(
             block.timestamp >= lastClaim[msg.sender] + claimInterval,
             "You must wait before claiming again"
         );
+
+        require(
+            token.balanceOf(address(this)) >= amountPerClaim,
+            "Not enough tokens in contract"
+        );
+
         require(
             token.transfer(msg.sender, amountPerClaim),
             "Token transfer failed"
