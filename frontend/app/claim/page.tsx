@@ -169,8 +169,6 @@ export default function TokenClaimPage() {
       args: [userAddress],
     });
 
-    setDebbug(lastClaim as string);
-
     const lastClaimTime = Number.parseInt(lastClaim as string) * 1000;
     setLastClaim(lastClaimTime);
 
@@ -198,6 +196,8 @@ export default function TokenClaimPage() {
       ],
     })
 
+    setDebbug(finalPayload);
+    
     setTimeout(() => {
       getTimeToClaim();
 
@@ -233,7 +233,7 @@ export default function TokenClaimPage() {
                 {user ? (
                   <>
                     <div className="rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
-                    {"debbug: "+debbug}
+                    {"debbug: "+JSON.stringify(debbug)}
                       <div className="text-white font-medium pb-4"><span className="font-bold">Address</span> <br /> {user ? `${user.slice(0, 6)}...${user.slice(-4)}` : 'Unknown'}</div>
                       <div className="text-white font-medium pb-4"><span className="font-bold">Balance</span> <br /> {userBalance} HAT</div>
                       <div className="flex flex-col items-center space-y-2">
