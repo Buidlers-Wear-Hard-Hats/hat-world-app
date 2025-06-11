@@ -353,7 +353,7 @@ export default function TokenClaimPage() {
                 </div>
               </CardContent>
               <CardFooter>
-                {user && (
+                {!user && (
                   <>
                     {!isValidate ?
                       <Button
