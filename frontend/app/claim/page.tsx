@@ -209,6 +209,8 @@ export default function TokenClaimPage() {
   
         setTimeout(() => {
           setClaimed(false);
+          const loginUser = localStorage.getItem("userWalletAddress");
+          getHatBalance(loginUser as string);
         }, 3000);
       }, 1500);
     }
