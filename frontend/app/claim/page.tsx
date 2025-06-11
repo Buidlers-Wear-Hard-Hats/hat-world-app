@@ -63,11 +63,12 @@ export default function TokenClaimPage() {
 
   useEffect(() => {
     const loginUser = localStorage.getItem("userWalletAddress");
+    setError(loginUser);
     if (loginUser) {
       setUser(loginUser);
       getHatBalance(loginUser);
     }
-  }, []);
+  }, [user]);
 
   // const handleLogin = async () => {
   //   try {
@@ -257,6 +258,7 @@ export default function TokenClaimPage() {
                 {user ? (
                   <>
                     <div className="rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
+                    {"error: "+error} 
                       <div className="text-white font-medium pb-4">Address <br /> {user?.walletAddress ? `${user.walletAddress.slice(0, 6)}...${user.walletAddress.slice(-4)}` : 'Unknown'}</div>
                       <div className="text-white font-medium pb-4">Balance <br /> {userBalance} HAT</div>
                       <div className="flex flex-col items-center space-y-2">
