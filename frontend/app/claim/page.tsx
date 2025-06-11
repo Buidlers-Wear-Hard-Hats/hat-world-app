@@ -44,66 +44,15 @@ export default function TokenClaimPage() {
 
   const HAT_CONTRACT_ADDRESS = '0xbA494aEa8295B5640Efb4FF9252df8D388e655dc';
 
-  // const refreshUserData = useCallback(async () => {
-  //   try {
-  //     const response = await fetch('/api/auth/me',{
-  //       credentials: 'include',
-  //     });
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       if (data.user) {
-  //         setUser(data.user);
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching user data:", error);
-  //   }
-  // }, []);
-
   useEffect(() => {
     const loginUser = localStorage.getItem("userWalletAddress");
     if (loginUser) {
       setUser(loginUser);
       getHatBalance(loginUser);
+      getTimeToClaim();
     }
   }, [user]);
 
-  // const handleLogin = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const res = await fetch(`/api/nonce`);
-  //     const { nonce } = await res.json();
-
-  //     const { finalPayload } = await MiniKit.commandsAsync.walletAuth(walletAuthInput(nonce));
-
-  //     if (finalPayload.status === 'error') {
-  //       setLoading(false);
-  //       return;
-  //     } else {
-  //       const response = await fetch('/api/auth/login', {
-  //         method: 'POST',
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //         },
-  //         body: JSON.stringify({
-  //           payload: finalPayload,
-  //           nonce,
-  //         }),
-  //         credentials: 'include',
-  //       });
-
-  //       if (response.status === 200) {
-  //         const user = MiniKit.user;
-  //         setUser(user);
-  //         await getHatBalance(user.walletAddress as string);
-  //       }
-  //       setLoading(false);
-  //     }
-  //   } catch (error) {
-  //     console.error("Login error:", error);
-  //     setLoading(false);
-  //   }
-  // };
 
   const handleLogin = async () => {
     if (!MiniKit.isInstalled()) {
@@ -203,6 +152,35 @@ export default function TokenClaimPage() {
     }
   }
 
+  const getTimeToClaim = async () => {
+    if (!user) return
+
+    const userAddress = user;
+    if (!userAddress) return;
+
+    const publicClient = getPublicClient(config);
+
+    const lastClaim = await publicClient.readContract({
+      abi: HAT_ABI,
+      address: HAT_CONTRACT_ADDRESS,
+      functionName: "lastClaim",
+      args: [userAddress],
+    });
+
+    const lastClaimTime = Number.parseInt(lastClaim as string) * 1000;
+    setLastClaim(lastClaimTime);
+
+    const now = Date.now();
+    const timeElapsed = now - lastClaimTime;
+    const cooldownPeriod = 24 * 60 * 60 * 1000;
+
+    if (timeElapsed < cooldownPeriod) {
+      setCanClaim(false);
+    } else {
+      setCanClaim(true);
+    }
+  }
+
   const claimTokens = async () => {
     setLoading(true);
     const { commandPayload, finalPayload } = await MiniKit.commandsAsync.sendTransaction({
@@ -231,9 +209,6 @@ export default function TokenClaimPage() {
     }, 1500);
   };
 
-  const handleClaimSuccess = (txId: string) => {
-    console.log("Claim initiated with transaction ID:", txId);
-  };
 
   // Función para actualizar el estado cuando finaliza el cooldown
   const handleCooldownComplete = () => {
