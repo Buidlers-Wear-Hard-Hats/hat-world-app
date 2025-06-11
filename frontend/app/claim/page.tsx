@@ -45,25 +45,29 @@ export default function TokenClaimPage() {
 
   const HAT_CONTRACT_ADDRESS = '0xbA494aEa8295B5640Efb4FF9252df8D388e655dc';
 
-  const refreshUserData = useCallback(async () => {
-    try {
-      const response = await fetch('/api/auth/me',{
-        credentials: 'include',
-      });
-      if (response.ok) {
-        const data = await response.json();
-        if (data.user) {
-          setUser(data.user);
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  }, []);
+  // const refreshUserData = useCallback(async () => {
+  //   try {
+  //     const response = await fetch('/api/auth/me',{
+  //       credentials: 'include',
+  //     });
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       if (data.user) {
+  //         setUser(data.user);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching user data:", error);
+  //   }
+  // }, []);
 
   useEffect(() => {
-    refreshUserData();
-  }, [refreshUserData]);
+    const loginUser = localStorage.getItem("userWalletAddress");
+    if (loginUser) {
+      setUser(loginUser);
+      getHatBalance(loginUser);
+    }
+  }, []);
 
   // const handleLogin = async () => {
   //   try {
@@ -136,6 +140,7 @@ export default function TokenClaimPage() {
 
       if (response.status === 200) {
         const user = MiniKit.user;
+        localStorage.setItem("userWalletAddress", user.walletAddress as string);
         setUser(user);
         await getHatBalance(user.walletAddress as string);
       }
