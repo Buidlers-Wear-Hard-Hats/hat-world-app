@@ -35,7 +35,6 @@ export default function TokenClaimPage() {
   const [user, setUser] = useState<any | null>(null);
   const [userBalance, setUserBalance] = useState<any | null>(null);
   const [isValidate, setIsValidate] = useState<any | null>(false);
-  const [error, setError] = useState<any | null>(null);
 
   const [lastClaim, setLastClaim] = useState<number | null>(null);
   const [canClaim, setCanClaim] = useState(true);
@@ -63,7 +62,6 @@ export default function TokenClaimPage() {
 
   useEffect(() => {
     const loginUser = localStorage.getItem("userWalletAddress");
-    setError(loginUser);
     if (loginUser) {
       setUser(loginUser);
       getHatBalance(loginUser);
@@ -142,7 +140,7 @@ export default function TokenClaimPage() {
       if (response.status === 200) {
         const user = MiniKit.user;
         localStorage.setItem("userWalletAddress", user.walletAddress as string);
-        setUser(user);
+        setUser(user.walletAddress as string);
         await getHatBalance(user.walletAddress as string);
       }
       setLoading(false);
@@ -258,9 +256,8 @@ export default function TokenClaimPage() {
                 {user ? (
                   <>
                     <div className="rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
-                    {"error: "+error} 
-                      <div className="text-white font-medium pb-4">Address <br /> {user?.walletAddress ? `${user.walletAddress.slice(0, 6)}...${user.walletAddress.slice(-4)}` : 'Unknown'}</div>
-                      <div className="text-white font-medium pb-4">Balance <br /> {userBalance} HAT</div>
+                      <div className="text-white font-medium pb-4"><span className="font-bold">Address</span> <br /> {user ? `${user.slice(0, 6)}...${user.slice(-4)}` : 'Unknown'}</div>
+                      <div className="text-white font-medium pb-4"><span className="font-bold">Balance</span> <br /> {userBalance} HAT</div>
                       <div className="flex flex-col items-center space-y-2">
                         <Button
                           onClick={handleLogout}
