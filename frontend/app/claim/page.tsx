@@ -176,7 +176,7 @@ export default function TokenClaimPage() {
 
     const now = Date.now();
     const timeElapsed = now - lastClaimTime;
-    const cooldownPeriod = 24 * 60 * 60 * 1000;
+    const cooldownPeriod = 1 * 60 * 60 * 1000;
 
     if (timeElapsed < cooldownPeriod) {
       setCanClaim(false);
@@ -199,9 +199,8 @@ export default function TokenClaimPage() {
     })
 
     setTimeout(() => {
-      const now = Date.now();
-      localStorage.setItem("lastHatClaim", now.toString());
-      setLastClaim(now);
+      getTimeToClaim();
+
       setCanClaim(false);
       setClaimed(true);
       setLoading(false);
@@ -315,7 +314,7 @@ export default function TokenClaimPage() {
                   <div className="mb-6">
                     <p className="mb-2 text-[#F5AD00]">Time left to claim:</p>
                     <Countdown
-                      targetDate={lastClaim + 24 * 60 * 60 * 1000}
+                      targetDate={lastClaim + 1 * 60 * 60 * 1000}
                       onComplete={handleCooldownComplete}
                     />
                   </div>
