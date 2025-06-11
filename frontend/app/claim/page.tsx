@@ -45,7 +45,7 @@ export default function TokenClaimPage() {
   const isMobile = useMobile();
 
   const HAT_CONTRACT_ADDRESS = '0xbA494aEa8295B5640Efb4FF9252df8D388e655dc';
-
+  
   useEffect(() => {
     const loginUser = localStorage.getItem("userWalletAddress");
     if (loginUser) {
@@ -138,8 +138,7 @@ export default function TokenClaimPage() {
 
       const validateAccount = verifyAccount as number > 0 ? true : false;
 
-      //setIsValidate(validateAccount);
-      setIsValidate(true);
+      setIsValidate(validateAccount);
 
       const tokenAmount = Number(formatUnits(balance as bigint, 18))
 
