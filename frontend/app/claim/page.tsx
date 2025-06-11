@@ -200,13 +200,13 @@ export default function TokenClaimPage() {
     if(finalPayload.status != "error"){
       setLoading(true);
       setTimeout(() => {
-        getTimeToClaim();
-  
+        const now = Date.now();
+        localStorage.setItem("lastHatClaim", now.toString());
+        setLastClaim(now);
         setCanClaim(false);
         setClaimed(true);
         setLoading(false);
   
-        // Resetear el mensaje de éxito después de 3 segundos
         setTimeout(() => {
           setClaimed(false);
         }, 3000);
