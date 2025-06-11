@@ -156,6 +156,7 @@ export default function TokenClaimPage() {
       });
 
       setUser(null);
+      localStorage.removeItem("userWalletAddress");
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -202,7 +203,6 @@ export default function TokenClaimPage() {
     }
   }
 
-  // Función para reclamar tokens
   const claimTokens = async () => {
     setLoading(true);
     const { commandPayload, finalPayload } = await MiniKit.commandsAsync.sendTransaction({
@@ -216,7 +216,6 @@ export default function TokenClaimPage() {
       ],
     })
 
-    // Simulación de una petición a la API
     setTimeout(() => {
       const now = Date.now();
       localStorage.setItem("lastHatClaim", now.toString());
