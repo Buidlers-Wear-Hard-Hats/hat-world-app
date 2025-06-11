@@ -184,7 +184,6 @@ export default function TokenClaimPage() {
   }
 
   const claimTokens = async () => {
-    setLoading(true);
     const { commandPayload, finalPayload } = await MiniKit.commandsAsync.sendTransaction({
       transaction: [
         {
@@ -199,6 +198,7 @@ export default function TokenClaimPage() {
     setDebbug(finalPayload);
 
     if(finalPayload.status != "error"){
+      setLoading(true);
       setTimeout(() => {
         getTimeToClaim();
   
@@ -235,7 +235,6 @@ export default function TokenClaimPage() {
                 {user ? (
                   <>
                     <div className="rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649]">
-                    {"debbug: "+JSON.stringify(debbug)}
                       <div className="text-white font-medium pb-4"><span className="font-bold">Address</span> <br /> {user ? `${user.slice(0, 6)}...${user.slice(-4)}` : 'Unknown'}</div>
                       <div className="text-white font-medium pb-4"><span className="font-bold">Balance</span> <br /> {userBalance} HAT</div>
                       <div className="flex flex-col items-center space-y-2">
@@ -243,9 +242,8 @@ export default function TokenClaimPage() {
                           onClick={handleLogout}
                           variant="secondary"
                           size="default"
-                          disabled={loading}
                         >
-                          {loading ? "Signing Out..." : "Sign Out"}
+                          {"Sign Out"}
                         </Button>
                       </div>
                     </div>
