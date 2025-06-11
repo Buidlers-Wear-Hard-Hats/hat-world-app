@@ -197,19 +197,21 @@ export default function TokenClaimPage() {
     })
 
     setDebbug(finalPayload);
-    
-    setTimeout(() => {
-      getTimeToClaim();
 
-      setCanClaim(false);
-      setClaimed(true);
-      setLoading(false);
-
-      // Resetear el mensaje de éxito después de 3 segundos
+    if(finalPayload.status != "error"){
       setTimeout(() => {
-        setClaimed(false);
-      }, 3000);
-    }, 1500);
+        getTimeToClaim();
+  
+        setCanClaim(false);
+        setClaimed(true);
+        setLoading(false);
+  
+        // Resetear el mensaje de éxito después de 3 segundos
+        setTimeout(() => {
+          setClaimed(false);
+        }, 3000);
+      }, 1500);
+    }
   };
 
 
