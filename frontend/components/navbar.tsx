@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Coins, User } from "lucide-react";
+import { Home, Coins, User, ListTodo } from "lucide-react";
 import {
   Dialog,
   DialogTrigger,
@@ -37,6 +37,15 @@ export function Navbar() {
           <span className="text-xs mt-1">Claim</span>
         </Link>
 
+        <Link
+          href="/tasks"
+          className={`flex flex-col items-center justify-center w-full h-full ${pathname === "/tasks" ? "text-[#F5AD00]" : "text-white/70"
+            }`}
+        >
+              <ListTodo className="h-6 w-6" />
+              <span className="text-xs mt-1">Tasks</span>
+        </Link>
+
         <Dialog>
           <DialogTrigger asChild>
             <button
@@ -61,6 +70,7 @@ export function Navbar() {
             </div>
           </DialogContent>
         </Dialog>
+
       </div>
     </nav>
   );
