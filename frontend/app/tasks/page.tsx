@@ -34,6 +34,7 @@ export default function ProfilePage() {
   const [canClaim, setCanClaim] = useState(true);
   const [loading, setLoading] = useState(false);
   const [claimed, setClaimed] = useState(false);
+  const [debbug, setDebbug] = useState<any | null>(null);
 
   const HAT_CONTRACT_ADDRESS = '0xbA494aEa8295B5640Efb4FF9252df8D388e655dc';
 
@@ -186,6 +187,8 @@ export default function ProfilePage() {
       ],
     })
 
+    setDebbug(finalPayload);
+
     if (finalPayload.status != "error") {
       setLoading(true);
       setTimeout(() => {
@@ -320,6 +323,7 @@ export default function ProfilePage() {
       {
         user && <div className="w-full max-w-md space-y-4">
           <div className="text-2xl text-[#2C2C5A] my-4">
+            {debbug}
             <span className="font-bold">Task Center</span><br />
             <span>Complete tasks to earn HAT</span>
           </div>
