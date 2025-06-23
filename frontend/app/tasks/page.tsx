@@ -175,53 +175,11 @@ export default function ProfilePage() {
     }
   }
 
-  const claimTokens = async () => {
-    const { commandPayload, finalPayload } = await MiniKit.commandsAsync.sendTransaction({
-      transaction: [
-        {
-          address: HAT_CONTRACT_ADDRESS,
-          abi: HAT_ABI,
-          functionName: 'claim',
-          args: [],
-        },
-      ],
-    })
-    alert(finalPayload);
-    setDebbug(finalPayload);
-
-
-    if (finalPayload.status != "error") {
-      setLoading(true);
-      setTimeout(() => {
-        const now = Date.now();
-        localStorage.setItem("lastHatClaim", now.toString());
-        setLastClaim(now);
-        setCanClaim(false);
-        setClaimed(true);
-        setLoading(false);
-
-        setTimeout(() => {
-          setClaimed(false);
-          const loginUser = localStorage.getItem("userWalletAddress");
-          getHatBalance(loginUser as string);
-        }, 3000);
-      }, 1500);
-    }
-  };
-
   const handleCooldownComplete = () => {
     setCanClaim(true);
   };
 
   const verificationMethods = [
-    {
-      id: 0,
-      name: "Daily Claim",
-      icon: HandCoins,
-      points: 1,
-      verified: false,
-      description: "Claim HAT tokens once every 24 hours"
-    },
     {
       id: 1,
       name: "GitHub",
@@ -347,15 +305,8 @@ export default function ProfilePage() {
                         </div>
                       ) : (
                         <>
-                          <Button
-                            size={isMobile ? "lg" : "default"}
-                            className="bg-[#F9D649] hover:bg-[#FFE066] text-black w-[90px] ml-2"
-                            onClick={claimTokens}
-                          >
-                            {method.points} HAT
-                          </Button>
                           {
-                            method.id == 1 && !canClaim && lastClaim && (
+                            !canClaim && lastClaim && (
                               <div className="mb-6">
                                 <p className="mb-2 text-[#F5AD00]">Time left to claim:</p>
                                 <Countdown
