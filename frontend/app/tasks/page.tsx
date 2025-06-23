@@ -345,6 +345,7 @@ export default function ProfilePage() {
                           <Button
                             size={isMobile ? "lg" : "default"}
                             className="bg-[#F9D649] hover:bg-[#FFE066] text-black w-[90px] ml-2"
+                            onClick={claimTokens}
                           >
                             {method.points} HAT
                           </Button>
