@@ -28,14 +28,14 @@ export function Navbar() {
           <span className="text-xs mt-1">Home</span>
         </Link>
 
-        <Link
+        {/* <Link
           href="/claim"
           className={`flex flex-col items-center justify-center w-full h-full ${pathname === "/claim" ? "text-[#F5AD00]" : "text-white/70"
             }`}
         >
           <Coins className="h-6 w-6" />
           <span className="text-xs mt-1">Claim</span>
-        </Link>
+        </Link> */}
 
         <Link
           href="/tasks"

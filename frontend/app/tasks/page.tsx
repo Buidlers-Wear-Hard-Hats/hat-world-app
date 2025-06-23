@@ -11,6 +11,7 @@ import { HAT_ABI } from "@/abi/hatAbi";
 import { getPublicClient } from '@wagmi/core';
 import { config } from '@/wagmi-config';
 import { formatUnits } from 'viem';
+import Countdown from "@/components/countdown";
 
 const walletAuthInput = (nonce: string): WalletAuthInput => {
   return {
@@ -26,7 +27,6 @@ export default function ProfilePage() {
   const isMobile = useMobile()
 
   const [user, setUser] = useState<any | null>(null);
-  const [userScore, setUserScore] = useState<any | null>(0);
   const [userBalance, setUserBalance] = useState<any | null>(0);
   const [isValidate, setIsValidate] = useState<any | null>(false);
 
@@ -97,6 +97,7 @@ export default function ProfilePage() {
       });
 
       setUser(null);
+      setUserBalance(0);
       localStorage.removeItem("userWalletAddress");
     } catch (error) {
       console.error("Logout error:", error);
@@ -210,6 +211,7 @@ export default function ProfilePage() {
 
   const verificationMethods = [
     {
+      id: 0,
       name: "Daily Claim",
       icon: HandCoins,
       points: 1,
@@ -217,6 +219,7 @@ export default function ProfilePage() {
       description: "Claim HAT tokens once every 24 hours"
     },
     {
+      id: 1,
       name: "GitHub",
       icon: Github,
       points: 5,
@@ -224,6 +227,7 @@ export default function ProfilePage() {
       description: "Connect your GitHub account"
     },
     {
+      id: 2,
       name: "Clone Repository",
       icon: CloudDownload,
       points: 10,
@@ -231,6 +235,7 @@ export default function ProfilePage() {
       description: "Clone a World repository"
     },
     {
+      id: 3,
       name: "X Post",
       icon: Hash,
       points: 10,
@@ -238,6 +243,7 @@ export default function ProfilePage() {
       description: "Make a build in public post with #BuidlersWearHardHat #WorldCh"
     },
     {
+      id: 4,
       name: "Quiz",
       icon: CircleHelp,
       points: 10,
@@ -335,12 +341,25 @@ export default function ProfilePage() {
                           <span className="ml-1 text-sm">Verified</span>
                         </div>
                       ) : (
-                        <Button
-                          size={isMobile ? "lg" : "default"}
-                          className="bg-[#F9D649] hover:bg-[#FFE066] text-black w-[90px] ml-2"
-                        >
-                          {method.points} HAT
-                        </Button>
+                        <>
+                          <Button
+                            size={isMobile ? "lg" : "default"}
+                            className="bg-[#F9D649] hover:bg-[#FFE066] text-black w-[90px] ml-2"
+                          >
+                            {method.points} HAT
+                          </Button>
+                          {
+                            method.id == 1 && !canClaim && lastClaim && (
+                              <div className="mb-6">
+                                <p className="mb-2 text-[#F5AD00]">Time left to claim:</p>
+                                <Countdown
+                                  targetDate={lastClaim + 24 * 60 * 60 * 1000}
+                                  onComplete={handleCooldownComplete}
+                                />
+                              </div>
+                            )
+                          }
+                        </>
                       )}
                     </div>
                   </div>
