@@ -186,8 +186,9 @@ export default function ProfilePage() {
         },
       ],
     })
-
+    alert(finalPayload);
     setDebbug(finalPayload);
+
 
     if (finalPayload.status != "error") {
       setLoading(true);
@@ -323,7 +324,7 @@ export default function ProfilePage() {
       {
         user && <div className="w-full max-w-md space-y-4">
           <div className="text-2xl text-[#2C2C5A] my-4">
-            {debbug}
+            <span>{debbug}</span>
             <span className="font-bold">Task Center</span><br />
             <span>Complete tasks to earn HAT</span>
           </div>
