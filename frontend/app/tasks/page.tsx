@@ -14,11 +14,11 @@ import { formatUnits } from 'viem';
 
 const walletAuthInput = (nonce: string): WalletAuthInput => {
   return {
-      nonce,
-      requestId: "0",
-      expirationTime: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-      notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
-      statement: "This is my statement and here is a link https://worldcoin.com/apps",
+    nonce,
+    requestId: "0",
+    expirationTime: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+    notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
+    statement: "This is my statement and here is a link https://worldcoin.com/apps",
   };
 };
 
@@ -50,11 +50,11 @@ export default function ProfilePage() {
     if (!MiniKit.isInstalled()) {
       return
     }
-  
+
     setLoading(true);
     const res = await fetch(`/api/nonce`)
     const { nonce } = await res.json()
-  
+
     const { commandPayload: generateMessageResult, finalPayload } = await MiniKit.commandsAsync.walletAuth({
       nonce: nonce,
       requestId: '0', // Optional
@@ -62,7 +62,7 @@ export default function ProfilePage() {
       notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
       statement: 'This is my statement and here is a link https://worldcoin.com/apps',
     })
-  
+
     if (finalPayload.status === 'error') {
       setLoading(false);
       return
@@ -185,7 +185,7 @@ export default function ProfilePage() {
       ],
     })
 
-    if(finalPayload.status != "error"){
+    if (finalPayload.status != "error") {
       setLoading(true);
       setTimeout(() => {
         const now = Date.now();
@@ -194,7 +194,7 @@ export default function ProfilePage() {
         setCanClaim(false);
         setClaimed(true);
         setLoading(false);
-  
+
         setTimeout(() => {
           setClaimed(false);
           const loginUser = localStorage.getItem("userWalletAddress");
@@ -261,7 +261,7 @@ export default function ProfilePage() {
         className="w-full max-w-md bg-[#2C2C5A] text-black shadow-xl border-0"
         style={{ borderRadius: "10px" }}>
         <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold text-[#F5AD00]">Builder Leaderboard</CardTitle>
+          <CardTitle className="text-2xl font-bold text-[#F5AD00]">Builder Leaderboard</CardTitle>
           <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[#F9D649] border-2 border-black">
             <img
               src="https://hat.ow.academy/assets/icon.png"
@@ -274,7 +274,7 @@ export default function ProfilePage() {
           <div className="flex justify-around items-start text-white text-sm sm:text-base">
             <div className="text-center">
               <p className="text-[#F5AD00] font-semibold">Address</p>
-              <p className="text-lg font-bold">{user ? `${user.slice(0, 6)}...${user.slice(-4)}` : 'Unknown'}</p>
+              <p className="text-lg font-bold">{user ? `${user.slice(0, 6)}...${user.slice(-4)}` : ''}</p>
             </div>
             <div className="text-center">
               <p className="text-[#F5AD00] font-semibold">Total Tokens</p>
@@ -283,53 +283,82 @@ export default function ProfilePage() {
           </div>
         </CardContent>
         <CardFooter>
-          <Button
-            className={`w-full bg-[#F9D649] hover:bg-[#FFE066] text-black text-lg`}
-            size={isMobile ? "lg" : "default"}
-          >
-            View leaderboard
-          </Button>
+          {user ? (
+            <>
+              <Button
+                className={`w-full bg-[#F9D649] hover:bg-[#FFE066] text-black text-lg`}
+                size={isMobile ? "lg" : "default"}
+              >
+                View leaderboard
+              </Button>
+            </>
+
+          ) : (
+            <>
+              <div className="rounded-lg bg-[#FFF3A3]/60 p-4 border border-[#F9D649] w-full">
+                <p className="mt-2 text-sm text-white text-center">
+                  Please login to complete tasks.
+                </p>
+                <div className="flex flex-col items-center space-y-2 w-full mt-2">
+                  <Button
+                    onClick={handleLogin}
+                  >
+                    Sign In
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
         </CardFooter>
       </div>
-
-
-      <div className="w-full max-w-md space-y-4">
-        <div className="text-2xl text-[#2C2C5A] my-4">
-          <span className="font-bold">Task Center</span><br />
-          <span>Complete tasks to earn HAT</span>
-        </div>
-        <div className="grid gap-4">
-          {verificationMethods.map((method) => (
-            <Card key={method.name} className="bg-[#2C2C5A] text-black shadow-xl border-0 h-[100px]">
-              <CardContent className="p-4 h-full">
-                <div className="flex items-center justify-between h-full">
-                  <div className="flex items-center space-x-3 flex-1">
-                    <method.icon className="h-6 w-6 text-[#F5AD00]" />
-                    <div>
-                      <p className="text-sm text-white">{method.description}</p>
+      {
+        user && <div className="w-full max-w-md space-y-4">
+          <div className="text-2xl text-[#2C2C5A] my-4">
+            <span className="font-bold">Task Center</span><br />
+            <span>Complete tasks to earn HAT</span>
+          </div>
+          <div className="grid gap-4">
+            {verificationMethods.map((method) => (
+              <Card key={method.name} className="bg-[#2C2C5A] text-black shadow-xl border-0 h-[100px]">
+                <CardContent className="p-4 h-full">
+                  <div className="flex items-center justify-between h-full">
+                    <div className="flex items-center space-x-3 flex-1">
+                      <method.icon className="h-6 w-6 text-[#F5AD00]" />
+                      <div>
+                        <p className="text-sm text-white">{method.description}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3 justify-end">
+                      {method.verified ? (
+                        <div className="flex items-center text-green-500 w-[90px]">
+                          <CheckCircle2 className="h-5 w-5" />
+                          <span className="ml-1 text-sm">Verified</span>
+                        </div>
+                      ) : (
+                        <Button
+                          size={isMobile ? "lg" : "default"}
+                          className="bg-[#F9D649] hover:bg-[#FFE066] text-black w-[90px]"
+                        >
+                          {method.points} HAT
+                        </Button>
+                      )}
                     </div>
                   </div>
-                  <div className="flex items-center space-x-3 justify-end">
-                    {method.verified ? (
-                      <div className="flex items-center text-green-500 w-[90px]">
-                        <CheckCircle2 className="h-5 w-5" />
-                        <span className="ml-1 text-sm">Verified</span>
-                      </div>
-                    ) : (
-                      <Button
-                        size={isMobile ? "lg" : "default"}
-                        className="bg-[#F9D649] hover:bg-[#FFE066] text-black w-[90px]"
-                      >
-                        {method.points} HAT
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <div className="flex flex-col items-center space-y-2 w-full mt-2">
+            <Button
+              onClick={handleLogout}
+              variant="secondary"
+              size="default"
+            >
+              {"Sign Out"}
+            </Button>
+          </div>
         </div>
-      </div>
+      }
     </motion.main>
   )
 } 
