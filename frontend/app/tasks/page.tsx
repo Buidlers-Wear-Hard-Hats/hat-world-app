@@ -27,7 +27,7 @@ export default function ProfilePage() {
 
   const [user, setUser] = useState<any | null>(null);
   const [userScore, setUserScore] = useState<any | null>(0);
-  const [userBalance, setUserBalance] = useState<any | null>(null);
+  const [userBalance, setUserBalance] = useState<any | null>(0);
   const [isValidate, setIsValidate] = useState<any | null>(false);
 
   const [lastClaim, setLastClaim] = useState<number | null>(null);
@@ -278,7 +278,7 @@ export default function ProfilePage() {
             </div>
             <div className="text-center">
               <p className="text-[#F5AD00] font-semibold">Total Tokens</p>
-              <p className="text-xl font-bold">{userScore} HAT</p>
+              <p className="text-xl font-bold">{userBalance} HAT</p>
             </div>
           </div>
         </CardContent>
@@ -337,7 +337,7 @@ export default function ProfilePage() {
                       ) : (
                         <Button
                           size={isMobile ? "lg" : "default"}
-                          className="bg-[#F9D649] hover:bg-[#FFE066] text-black w-[90px]"
+                          className="bg-[#F9D649] hover:bg-[#FFE066] text-black w-[90px] ml-2"
                         >
                           {method.points} HAT
                         </Button>
