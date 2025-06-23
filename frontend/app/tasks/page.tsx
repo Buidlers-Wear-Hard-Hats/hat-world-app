@@ -190,11 +190,11 @@ export default function ProfilePage() {
     },
     {
       id: 2,
-      name: "Clone Repository",
+      name: "Fork Repository",
       icon: CloudDownload,
       points: 10,
       verified: false,
-      description: "Clone a World repository"
+      description: "Fork a World repository"
     },
     {
       id: 3,
@@ -204,14 +204,14 @@ export default function ProfilePage() {
       verified: false,
       description: "Make a build in public post with #BuidlersWearHardHat #WorldCh"
     },
-    {
-      id: 4,
-      name: "Quiz",
-      icon: CircleHelp,
-      points: 10,
-      verified: false,
-      description: "Complete the quiz"
-    }
+    // {
+    //   id: 4,
+    //   name: "Quiz",
+    //   icon: CircleHelp,
+    //   points: 10,
+    //   verified: false,
+    //   description: "Complete the quiz"
+    // }
   ]
 
   return (
@@ -306,15 +306,12 @@ export default function ProfilePage() {
                       ) : (
                         <>
                           {
-                            !canClaim && lastClaim && (
-                              <div className="mb-6">
-                                <p className="mb-2 text-[#F5AD00]">Time left to claim:</p>
-                                <Countdown
-                                  targetDate={lastClaim + 24 * 60 * 60 * 1000}
-                                  onComplete={handleCooldownComplete}
-                                />
-                              </div>
-                            )
+                            <Button
+                              size={isMobile ? "lg" : "default"}
+                              className="bg-[#F9D649] hover:bg-[#FFE066] text-black w-[90px] ml-2"
+                            >
+                              {method.points} HAT
+                            </Button>
                           }
                         </>
                       )}
