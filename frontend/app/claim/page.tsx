@@ -144,9 +144,7 @@ export default function TokenClaimPage() {
   }
 
   const getAddressVerification = async () => {
-    //const loginUser = localStorage.getItem("userWalletAddress");
-    const loginUser = "0x34149390029Bbf4f4D9E7AdEa715D7055e145C05";
-    console.log("loginUser: " + loginUser);
+    const loginUser = localStorage.getItem("userWalletAddress");
     if (!loginUser) return;
 
     const publicClient = getPublicClient(config);
