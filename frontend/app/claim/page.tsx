@@ -22,19 +22,19 @@ import { formatUnits } from 'viem';
 import { MiniKit, WalletAuthInput } from "@worldcoin/minikit-js";
 
 const walletAuthInput = (nonce: string): WalletAuthInput => {
-    return {
-        nonce,
-        requestId: "0",
-        expirationTime: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-        notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
-        statement: "This is my statement and here is a link https://worldcoin.com/apps",
-    };
+  return {
+    nonce,
+    requestId: "0",
+    expirationTime: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+    notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
+    statement: "This is my statement and here is a link https://worldcoin.com/apps",
+  };
 };
 
 export default function TokenClaimPage() {
   const [user, setUser] = useState<any | null>(null);
   const [userBalance, setUserBalance] = useState<any | null>(null);
-  const [isValidate, setIsValidate] = useState<any | null>(false);
+  const [isValidate, setIsValidate] = useState<any | null>(0);
 
   const [debbug, setDebbug] = useState<any | null>(null);
 
@@ -45,7 +45,7 @@ export default function TokenClaimPage() {
   const isMobile = useMobile();
 
   const HAT_CONTRACT_ADDRESS = '0xbA494aEa8295B5640Efb4FF9252df8D388e655dc';
-  
+
   useEffect(() => {
     const loginUser = localStorage.getItem("userWalletAddress");
     if (loginUser) {
@@ -60,11 +60,11 @@ export default function TokenClaimPage() {
     if (!MiniKit.isInstalled()) {
       return
     }
-  
+
     setLoading(true);
     const res = await fetch(`/api/nonce`)
     const { nonce } = await res.json()
-  
+
     const { commandPayload: generateMessageResult, finalPayload } = await MiniKit.commandsAsync.walletAuth({
       nonce: nonce,
       requestId: '0', // Optional
@@ -72,7 +72,7 @@ export default function TokenClaimPage() {
       notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
       statement: 'This is my statement and here is a link https://worldcoin.com/apps',
     })
-  
+
     if (finalPayload.status === 'error') {
       setLoading(false);
       return
@@ -129,17 +129,6 @@ export default function TokenClaimPage() {
         args: [userAddress],
       });
 
-      const verifyAccount = await publicClient.readContract({
-        abi: HAT_ABI,
-        address: HAT_CONTRACT_ADDRESS,
-        functionName: "getAddressVerification",
-        args: [userAddress],
-      });
-
-      const validateAccount = verifyAccount as number > 0 ? true : false;
-
-      setIsValidate(validateAccount);
-
       const tokenAmount = Number(formatUnits(balance as bigint, 18))
 
       const formattedBalance = new Intl.NumberFormat('en-US', {
@@ -152,6 +141,24 @@ export default function TokenClaimPage() {
     } catch (error) {
       console.error("Error getting HAT balance:", error);
     }
+  }
+
+  const getAddressVerification = async () => {
+    const loginUser = localStorage.getItem("userWalletAddress");
+    if (!loginUser) return;
+
+    const publicClient = getPublicClient(config);
+
+    const verifyAccount = await publicClient.readContract({
+      abi: HAT_ABI,
+      address: HAT_CONTRACT_ADDRESS,
+      functionName: "getAddressVerification",
+      args: [loginUser],
+    });
+
+    const validateAccount = verifyAccount as number > 0 ? 2 : 1;
+
+    setIsValidate(validateAccount);
   }
 
   const getTimeToClaim = async () => {
@@ -197,7 +204,7 @@ export default function TokenClaimPage() {
 
     setDebbug(finalPayload);
 
-    if(finalPayload.status != "error"){
+    if (finalPayload.status != "error") {
       setLoading(true);
       setTimeout(() => {
         const now = Date.now();
@@ -206,7 +213,7 @@ export default function TokenClaimPage() {
         setCanClaim(false);
         setClaimed(true);
         setLoading(false);
-  
+
         setTimeout(() => {
           setClaimed(false);
           const loginUser = localStorage.getItem("userWalletAddress");
@@ -332,37 +339,58 @@ export default function TokenClaimPage() {
                   </p>
                 </div>
               </CardContent>
-              <CardFooter>
-                {user && (
-                  <>
-                    {isValidate ?
-                      <Button
-                        className={`w-full ${canClaim
-                          ? "bg-[#F9D649] hover:bg-[#FFE066] text-black"
-                          : "bg-gray-400 cursor-not-allowed text-gray-600"
-                          }`}
-                        disabled={!canClaim || loading}
-                        onClick={claimTokens}
-                        size={isMobile ? "lg" : "default"}
-                      >
-                        {loading
-                          ? "Claiming..."
-                          : canClaim
-                            ? "Claim HAT Tokens"
-                            : "On Cooldown"}
-                      </Button>
-                      :
-                      <Button
-                        className={`w-full bg-[#F9D649] hover:bg-[#FFE066] text-black`}
-                        disabled={!isValidate}
-                        size={isMobile ? "lg" : "default"}
-                      >
-                        You need verify your World account to claim HAT
-                      </Button>
-                    }
-                  </>
-                )}
-              </CardFooter>
+              {!user ?
+                <CardFooter>
+                  <div className="flex flex-col items-center space-y-2 w-full mt-2">
+                    <Button
+                      onClick={handleLogin}
+                    >
+                      Sign In
+                    </Button>
+                  </div>
+                </CardFooter>
+                :
+                <CardFooter>
+                  {user && (
+                    <>
+                      {isValidate == 2 ?
+                        <Button
+                          className={`w-full ${canClaim
+                            ? "bg-[#F9D649] hover:bg-[#FFE066] text-black"
+                            : "bg-gray-400 cursor-not-allowed text-gray-600"
+                            }`}
+                          disabled={!canClaim || loading}
+                          onClick={claimTokens}
+                          size={isMobile ? "lg" : "default"}
+                        >
+                          {loading
+                            ? "Claiming..."
+                            : canClaim
+                              ? "Claim HAT Tokens"
+                              : "On Cooldown"}
+                        </Button>
+                        :
+                        isValidate == 1 ?
+                          <Button
+                            className={`w-full bg-[#F9D649] hover:bg-[#FFE066] text-black`}
+                            disabled={isValidate == 1}
+                            size={isMobile ? "lg" : "default"}
+                          >
+                            You need verify your World Id to claim HAT
+                          </Button>
+                          :
+                          <Button
+                            className={`w-full bg-[#F9D649] hover:bg-[#FFE066] text-black`}
+                            onClick={getAddressVerification}
+                            size={isMobile ? "lg" : "default"}
+                          >
+                            Verify your account
+                          </Button>
+                      }
+                    </>
+                  )}
+                </CardFooter>
+              }
             </motion.div>
           )}
         </>
