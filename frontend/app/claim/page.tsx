@@ -296,7 +296,7 @@ export default function TokenClaimPage() {
               </CardFooter>
               :
               <CardFooter>
-                {!user && (
+                {user && (
                   <>
                     {isValidate == 2 ?
                       <Button
