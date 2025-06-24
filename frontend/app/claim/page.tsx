@@ -341,13 +341,7 @@ export default function TokenClaimPage() {
               </CardContent>
               {!user ?
                 <CardFooter>
-                  <div className="flex flex-col items-center space-y-2 w-full mt-2">
-                    <Button
-                      onClick={handleLogin}
-                    >
-                      Sign In
-                    </Button>
-                  </div>
+       
                 </CardFooter>
                 :
                 <CardFooter>
