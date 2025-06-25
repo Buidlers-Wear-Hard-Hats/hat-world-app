@@ -19,7 +19,13 @@ import { getPublicClient } from '@wagmi/core';
 import { config } from '@/wagmi-config';
 import { formatUnits } from 'viem';
 
-import { MiniKit, WalletAuthInput } from "@worldcoin/minikit-js";
+import { MiniKit, WalletAuthInput, VerifyCommandInput, VerificationLevel, ISuccessResult } from '@worldcoin/minikit-js'
+
+const verifyPayload: VerifyCommandInput = {
+	action: 'voting-action', // This is your action ID from the Developer Portal
+	signal: '0x12312', // Optional additional data
+	verification_level: VerificationLevel.Orb, // Orb | Device
+}
 
 const walletAuthInput = (nonce: string): WalletAuthInput => {
   return {
@@ -112,6 +118,36 @@ export default function TokenClaimPage() {
       console.error("Logout error:", error);
     }
   };
+
+  const handleVerify = async () => {
+    if (!MiniKit.isInstalled()) {
+      return
+    }
+    // World App will open a drawer prompting the user to confirm the operation, promise is resolved once user confirms or cancels
+    const {finalPayload} = await MiniKit.commandsAsync.verify(verifyPayload)
+      if (finalPayload.status === 'error') {
+        return console.log('Error payload', finalPayload)
+      }
+  
+      // Verify the proof in the backend
+      const verifyResponse = await fetch('/api/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+        payload: finalPayload as ISuccessResult, // Parses only the fields we need to verify
+        action: 'voting-action',
+        signal: '0x12312', // Optional
+      }),
+    })
+  
+    // TODO: Handle Success!
+    const verifyResponseJson = await verifyResponse.json()
+    if (verifyResponseJson.status === 200) {
+      console.log('Verification success!')
+    }
+  }
 
   const getHatBalance = async (address: string) => {
     try {
@@ -324,7 +360,7 @@ export default function TokenClaimPage() {
                         :
                         <Button
                           className={`w-full bg-[#F9D649] hover:bg-[#FFE066] text-black`}
-                          onClick={getAddressVerification}
+                          onClick={handleVerify}
                           size={isMobile ? "lg" : "default"}
                         >
                           Verify your account
