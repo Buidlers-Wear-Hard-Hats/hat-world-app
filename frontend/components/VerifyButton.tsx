@@ -62,7 +62,7 @@ export function VerifyButton({ onVerificationSuccess }: VerifyButtonProps) {
 
       if (finalPayload.status === "error") {
         console.log("Error payload", finalPayload);
-        setVerificationError(`Verification failed: Please try again`);
+        setVerificationError(`Verification failed: Please try again: `+finalPayload);
         setIsVerifying(false);
         return;
       }
