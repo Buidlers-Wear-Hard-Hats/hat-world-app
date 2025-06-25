@@ -18,6 +18,7 @@ import { HAT_ABI } from "@/abi/hatAbi";
 import { getPublicClient } from '@wagmi/core';
 import { config } from '@/wagmi-config';
 import { formatUnits } from 'viem';
+import { VerifyButton } from "@/components/VerifyButton";
 
 import { MiniKit, WalletAuthInput, VerifyCommandInput, VerificationLevel, ISuccessResult } from '@worldcoin/minikit-js'
 
@@ -61,6 +62,11 @@ export default function TokenClaimPage() {
     }
   }, [user]);
 
+
+  const handleVerificationSuccess = () => {
+    console.log("Verification success callback triggered in TuteApp");
+    setIsValidate(3);
+  };
 
   const handleLogin = async () => {
     if (!MiniKit.isInstalled()) {
@@ -358,13 +364,7 @@ export default function TokenClaimPage() {
                           You need verify your World Id to claim HAT
                         </Button>
                         :
-                        <Button
-                          className={`w-full bg-[#F9D649] hover:bg-[#FFE066] text-black`}
-                          onClick={handleVerify}
-                          size={isMobile ? "lg" : "default"}
-                        >
-                          Verify your account
-                        </Button>
+                        <VerifyButton onVerificationSuccess={handleVerificationSuccess} />
                     }
                   </>
                 )}
